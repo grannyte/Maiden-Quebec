@@ -2,6 +2,10 @@
 
 
 def main():
+    """
+    Point d'entré du programme.  Celui-ci valide que les arguments passés en paramètre
+    sont conformes.
+    """
     import argparse
 
     parser = argparse.ArgumentParser(description='Text-based game')
