@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+class Map:
+    map = None
 
-def load_from_file(filename):
-        """Charge un fichier à partir d'un fichier"""
-        map_as_string = []
-        with open(filename) as f:
-            map_as_string = f.readlines()
-        return ''.join(map_as_string)
+    def __init__(self, filename):
+        self.map = [list(line) for line in open(filename)]    
+
+    def __str__(self):
+        return ''.join(str(item) for line in self.map for item in line)
+     
