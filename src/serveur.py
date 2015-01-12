@@ -19,3 +19,18 @@ class Server(socketserver.BaseRequestHandler):
         print(self.data)
         # just send back the same data, but upper-cased
         self.request.sendall(self.data.upper())
+
+
+def run_server():
+    """Démarre le serveur"""
+    host, port = "localhost", 9999
+
+    # Create the server, binding to localhost on port 9999
+    server = socketserver.TCPServer((host, port), Server)
+
+    # Activate the server; this will keep running until you
+    # interrupt the program with Ctrl-C
+    server.serve_forever()
+
+if __name__ == "__main__":
+    run_server()
