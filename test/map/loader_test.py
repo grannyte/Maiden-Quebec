@@ -3,7 +3,7 @@
 import unittest
 import os
 
-from src.map.loader import load_from_file
+from src.map.loader import Map
 
 
 class MapLoaderTestCase(unittest.TestCase):
@@ -16,12 +16,21 @@ class MapLoaderTestCase(unittest.TestCase):
         cls.project_dir = os.path.abspath(os.path.join(parent, os.pardir))
         cls.data_dir = os.path.abspath(os.path.join(parent, "data"))
 
-    def test_fail_to_open_file(self):
-        self.assertRaises(OSError, load_from_file, "filename_that_should_not_exist")
+    def test_constructeur_avec_fichier_inexistant(self):
+        filename= os.path.abspath(os.path.join(self.data_dir, "levelXX.map"))
+        with self.assertRaises(FileNotFoundError):
+            map = Map(filename)
 
-    def test_load_the_file_content(self):
+    def test_constructeur_avec_fichier_existant_level00(self):
         filename= os.path.abspath(os.path.join(self.data_dir, "level00.map"))
-        actual = load_from_file(filename)
+        try:
+            map = Map(filename)
+        except FileNotFoundError:
+            self.fail()
+
+    def test_repr(self):
+        filename= os.path.abspath(os.path.join(self.data_dir, "level00.map"))
+        actual = str(Map(filename))
         expect = ("#######\n"
                   "#     #\n"
                   "# H  *#\n"
