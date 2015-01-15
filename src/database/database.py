@@ -17,6 +17,10 @@ class Database:
         self.conn.close()
 
     def populate(self):
+        self.__populate_weapons()
+        self.__populate_monsters()
+
+    def __populate_weapons(self):
         """Inscrit des éléments à l'intérieur de la base de données"""
         self.cursor.execute('CREATE TABLE weapons (name, damage)')
         weapons = [('excalibur', 10),
@@ -24,3 +28,12 @@ class Database:
                    ('dague rouillé', 1),
                    ]
         self.cursor.executemany('INSERT INTO weapons VALUES (?,?)', weapons)
+
+    def __populate_monsters(self):
+        """Inscrit des éléments à l'intérieur de la base de données"""
+        self.cursor.execute('CREATE TABLE monsters (name, hp ,damage)')
+        weapons = [('rat', 10, 1),
+                   ('bat', 10, 2),
+                   ('thief', 25, 5),
+                   ]
+        self.cursor.executemany('INSERT INTO weapons VALUES (?,?,?)', weapons)
