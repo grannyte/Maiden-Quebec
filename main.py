@@ -3,6 +3,7 @@
 import os
 import pygame
 import spritesheet
+import hero
 
 class Game:
     """Instantiates all the basic elements of the game."""
@@ -15,6 +16,8 @@ class Game:
         self._init_screen(width, height)
         self._init_project_dir()
         self._init_spritesheet()
+        self.heroes = pygame.sprite.Group()
+        self._hero = hero.Hero(self._spritesheet, self.heroes)
 
     def _init_screen(self, width, height):
         """Initialize pygame's screen"""
@@ -33,21 +36,20 @@ class Game:
         ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
         self._spritesheet = spritesheet.Spritesheet(ss_path)
 
-    def _load_hero(self, x, y):
-        hero = self._spritesheet.image_at((0, 18*32, 32, 32))
-        self._screen.blit(hero, (x, y))
-
     def run(self):
         """Main loop of the game"""
         colors = {'white': (255, 255, 255)}
         clock = pygame.time.Clock()
         is_running = True
+        x, y = 100, 100
+        x_change = 0
         while is_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     is_running = False
+                self._hero.control(event)
             self._screen.fill(colors['white'])
-            self._load_hero(0, 0)
+            self.heroes.draw(self._screen)
             pygame.display.update()
             clock.tick(60)
         pygame.quit()
