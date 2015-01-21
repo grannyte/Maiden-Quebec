@@ -7,12 +7,12 @@ from entity import Entity
 
 
 
-class Platform(Entity):
+class Tile(Entity):
     def __init__(self, x, y):
         Entity.__init__(self)
         self._init_project_dir()
         self._init_spritesheet()
-        rect = (32, 2*32, 32, 32)
+        rect = (0*32, 1*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
         self.rect = Rect(x, y, 32, 32)
 
@@ -31,11 +31,4 @@ class Platform(Entity):
         pass
 
     def collide(self, p, xvel, yvel):
-        if xvel > 0:
-            p.rect.right = self.rect.left
-        if xvel < 0:
-            p.rect.left = self.rect.right
-        if yvel > 0:
-            p.rect.bottom = self.rect.top
-        if yvel < 0:
-            p.rect.top = self.rect.bottom
+        pass

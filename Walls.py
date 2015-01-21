@@ -2,27 +2,28 @@ __author__ = 'granyte'
 
 
 
+
 import spritesheet
+import os
 import pygame
 from pygame import *
-from entity import Entity
 from tile import Tile
 
 
-
-
-class Spike(Tile):
+class Walls(Tile):
     def __init__(self, x, y):
         Tile.__init__(self, x, y)
-        rect = (3*32, 3*32, 32, 32)
+        rect = (1*32, 2*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
 
     def collide(self, p, xvel, yvel):
         if xvel > 0:
-            p.rect.right = (self.rect.left-32)
+            p.rect.right = self.rect.left
         if xvel < 0:
-            p.rect.left = (self.rect.right+32)
+            p.rect.left = self.rect.right
         if yvel > 0:
-            p.rect.bottom = (self.rect.top-32)
+            p.rect.bottom = self.rect.top
         if yvel < 0:
-            p.rect.top = (self.rect.bottom+32)
+            p.rect.top = self.rect.bottom
+
+

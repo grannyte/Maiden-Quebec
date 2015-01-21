@@ -15,6 +15,7 @@ class Player(Entity):
         self._init_spritesheet()
         rect = (0, 18*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
+        self.image.set_colorkey((0, 0, 0))
         self.rect = Rect(x, y, 32, 32)
 
     def _init_project_dir(self):

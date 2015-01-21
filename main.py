@@ -1,11 +1,12 @@
 import pygame
 from pygame import *
 from player import Player
-from platform import Platform
+from tile import Tile
 from exitblock import ExitBlock
 from camera import ComplexCamera
 from map import create_level
 from Spike import Spike
+from Walls import Walls
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
@@ -27,6 +28,7 @@ def main():
     bg = Surface((32, 32))
     bg.convert()
     bg.fill(Color("#000000"))
+    map = pygame.sprite.Group()
     entities = pygame.sprite.Group()
     player = Player(32, 32)
     platforms = []
@@ -38,17 +40,21 @@ def main():
     for row in level:
         for col in row:
             if col == "P":
-                p = Platform(x, y)
+                p = Walls(x, y)
                 platforms.append(p)
                 entities.add(p)
-            if col == "S":
+            elif col == "S":
                 p = Spike(x, y)
                 platforms.append(p)
                 entities.add(p)
-            if col == "E":
+            elif col == "E":
                 e = ExitBlock(x, y)
                 platforms.append(e)
                 entities.add(e)
+            else:
+                p = Tile(x, y)
+                platforms.append(p)
+                map.add(p)
             x += 32
         y += 32
         x = 0
@@ -79,6 +85,10 @@ def main():
 
         # update player, draw everything else
         player.update()
+
+        for t in map:
+            screen.blit(t.image, camera.apply(t))
+
         for e in entities:
             screen.blit(e.image, camera.apply(e))
 
