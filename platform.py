@@ -30,3 +30,12 @@ class Platform(Entity):
     def update(self):
         pass
 
+    def collide(self, p, xvel, yvel):
+        if xvel > 0:
+            p.rect.right = self.rect.left
+        if xvel < 0:
+            p.rect.left = self.rect.right
+        if yvel > 0:
+            p.rect.bottom = self.rect.top
+        if yvel < 0:
+            p.rect.top = self.rect.bottom

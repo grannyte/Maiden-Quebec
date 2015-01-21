@@ -12,4 +12,5 @@ class ExitBlock(Platform):
         rect = (32*6, 2*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
 
-
+    def collide(self, p, xvel, yvel):
+        pygame.event.post(pygame.event.Event(QUIT))

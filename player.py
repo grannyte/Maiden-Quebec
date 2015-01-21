@@ -51,22 +51,4 @@ class Player(Entity):
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
             if pygame.sprite.collide_rect(self, p):
-                if isinstance(p, exitblock.ExitBlock):
-                    pygame.event.post(pygame.event.Event(QUIT))
-                if xvel > 0:
-                    self.rect.right = p.rect.left
-                if xvel < 0:
-                    self.rect.left = p.rect.right
-                if yvel > 0:
-                    self.rect.bottom = p.rect.top
-                if yvel < 0:
-                    self.rect.top = p.rect.bottom
-                if isinstance(p, Spike.Spike):
-                    if xvel > 0:
-                        self.rect.right = (p.rect.left-32)
-                    if xvel < 0:
-                        self.rect.left = (p.rect.right+32)
-                    if yvel > 0:
-                        self.rect.bottom = (p.rect.top-32)
-                    if yvel < 0:
-                        self.rect.top = (p.rect.bottom+32)
+                p.collide(self, xvel, yvel)
