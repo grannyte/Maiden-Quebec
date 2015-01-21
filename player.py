@@ -14,5 +14,15 @@ class Player(Entity):
         self.rect = Rect(x, y, 32, 32)
 
     def update(self):
-        self.rect.left += 32
-        self.rect.top += 32
+        pass
+
+    def control(self, local_event):
+        if local_event.type == pygame.KEYDOWN:
+            if local_event.key == pygame.K_LEFT:
+                self.rect.left -= 32
+            elif local_event.key == pygame.K_RIGHT:
+                self.rect.left += 32
+            elif local_event.key == pygame.K_UP:
+                self.rect.top -= 32
+            elif local_event.key == pygame.K_DOWN:
+                self.rect.top += 32

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+import os
+import spritesheet
 import pygame
 from pygame import *
 from entity import Entity

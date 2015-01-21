@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+import spritesheet
+import os
 import pygame
 from pygame import *
 from platform import Platform

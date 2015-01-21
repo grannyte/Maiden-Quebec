@@ -4,7 +4,7 @@ from player import Player
 from platform import Platform
 from exitblock import ExitBlock
 from camera import ComplexCamera
-
+from map import create_level
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
 HALF_WIDTH = int(WIN_WIDTH / 2)
@@ -31,32 +31,8 @@ def main():
     platforms = []
 
     x = y = 0
-    level = [
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "P                                          P",
-        "P                                          P",
-        "P                                          P",
-        "P                    PPPPPPPPPPP           P",
-        "P                                          P",
-        "P                                          P",
-        "P                                          P",
-        "P    PPPPPPPP                              P",
-        "P                                          P",
-        "P                          PPPPPPP         P",
-        "P                 PPPPPP                   P",
-        "P                                          P",
-        "P         PPPPPPP                          P",
-        "P                                          P",
-        "P                     PPPPPP               P",
-        "P                                          P",
-        "P   PPPPPPPPPPP                            P",
-        "P                                          P",
-        "P                 PPPPPPPPPPP              P",
-        "P                                          P",
-        "P                                          P",
-        "P                                          P",
-        "P                                          P",
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",]
+    level = create_level()
+
     # build the level
     for row in level:
         for col in row:
@@ -86,6 +62,8 @@ def main():
                 raise SystemExit
             if e.type == KEYDOWN and e.key == K_ESCAPE:
                 raise SystemExit
+            else:
+                player.control(e)
 
         # draw background
         for y in range(32):
