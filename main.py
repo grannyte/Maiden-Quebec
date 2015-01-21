@@ -24,9 +24,9 @@ CAMERA_SLACK = 30
 class Game():
     def __init__(self):
         self._init_pygame()
-        self._init_game_variable()
         self._init_project_dir()
         self._init_spritesheet()
+        self._init_game_variable()
         self._load_level()
 
         self.camera = ComplexCamera(self.total_level_width, self.total_level_height, WIN_WIDTH, WIN_HEIGHT)
@@ -48,7 +48,7 @@ class Game():
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32)
+        self.player = Player(32, 32, self._spritesheet)
         self.platforms = []
 
     def _init_pygame(self):
