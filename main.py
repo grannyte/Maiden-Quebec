@@ -1,4 +1,6 @@
 import pygame
+import spritesheet
+import os
 from pygame import *
 from player import Player
 from tile import Tile
@@ -18,81 +20,111 @@ DEPTH = 32
 FLAGS = 0
 CAMERA_SLACK = 30
 
-def main():
-    global cameraX, cameraY
-    pygame.init()
-    screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
-    pygame.display.set_caption("Use arrows to move!")
-    timer = pygame.time.Clock()
 
-    bg = Surface((32, 32))
-    bg.convert()
-    bg.fill(Color("#000000"))
-    map = pygame.sprite.Group()
-    entities = pygame.sprite.Group()
-    player = Player(32, 32)
-    platforms = []
+class Game():
+    def __init__(self):
+        global cameraX, cameraY
+        self._init_pygame()
+        self._init_game_variable()
+        self._init_project_dir()
+        self._init_spritesheet()
+        self._load_level()
 
-    x = y = 0
-    level = create_level()
+        self.camera = ComplexCamera(self.total_level_width, self.total_level_height, WIN_WIDTH, WIN_HEIGHT)
 
-    # build the level
-    for row in level:
-        for col in row:
-            if col == "P":
-                p = Walls(x, y)
-                platforms.append(p)
-                entities.add(p)
-            elif col == "S":
-                p = Spike(x, y)
-                platforms.append(p)
-                entities.add(p)
-            elif col == "E":
-                e = ExitBlock(x, y)
-                platforms.append(e)
-                entities.add(e)
-            else:
-                p = Tile(x, y)
-                platforms.append(p)
-                map.add(p)
-            x += 32
-        y += 32
-        x = 0
+        self.run(self.camera)
 
-    total_level_width = len(level[0])*32
-    total_level_height = len(level)*32
-    camera = ComplexCamera(total_level_width, total_level_height, WIN_WIDTH, WIN_HEIGHT)
-    entities.add(player)
+    def _init_project_dir(self):
+        """Initialize project directory"""
+        full_path = os.path.realpath(__file__)
+        self._project_dir = os.path.dirname(full_path)
 
-    is_running = True
-    while is_running:
-        timer.tick(60)
+    def _init_spritesheet(self):
+        """Initialize spritesheet"""
+        spritesheets = ["fantasy-tileset.png"]
+        ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
+        self._spritesheet = spritesheet.Spritesheet(ss_path)
 
-        for e in pygame.event.get():
-            if e.type == QUIT:
-                raise SystemExit
-            if e.type == KEYDOWN and e.key == K_ESCAPE:
-                raise SystemExit
-            else:
-                player.control(e, platforms)
+    def _init_game_variable(self):
+        self.timer = pygame.time.Clock()
+        self.map = pygame.sprite.Group()
+        self.entities = pygame.sprite.Group()
+        self.player = Player(32, 32)
+        self.platforms = []
 
-        # draw background
-        for y in range(32):
-            for x in range(32):
-                screen.blit(bg, (x * 32, y * 32))
+    def _init_pygame(self):
+        self.pygame = pygame
+        self.pygame.init()
+        self.screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
+        self.pygame.display.set_caption("Use arrows to move!")
+        self.bg = Surface((32, 32))
+        self.bg.convert()
+        self.bg.fill(Color("#000000"))
 
-        camera.update(player)
+    def _load_level(self):
+        x = y = 0
+        self.level = create_level()
+        # build the level
+        for row in self.level:
+            for col in row:
+                if col == "P":
+                    p = Walls(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.entities.add(p)
+                elif col == "S":
+                    p = Spike(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.entities.add(p)
+                elif col == "E":
+                    e = ExitBlock(x, y, self._spritesheet)
+                    self.platforms.append(e)
+                    self.entities.add(e)
+                else:
+                    p = Tile(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.map.add(p)
+                x += 32
+            y += 32
+            x = 0
+        self.total_level_width = len(self.level[0]) * 32
+        self.total_level_height = len(self.level) * 32
+        self.entities.add(self.player)
 
-        # update player, draw everything else
-        player.update()
+    def run(self, camera):
+        is_running = True
+        while is_running:
+            self.timer.tick(60)
 
-        for t in map:
-            screen.blit(t.image, camera.apply(t))
+            for e in pygame.event.get():
+                if e.type == QUIT:
+                    raise SystemExit
+                if e.type == KEYDOWN and e.key == K_ESCAPE:
+                    raise SystemExit
+                else:
+                    self.player.control(e, self.platforms)
 
-        for e in entities:
-            screen.blit(e.image, camera.apply(e))
+            # draw background
+            for y in range(32):
+                for x in range(32):
+                    self.screen.blit(self.bg, (x * 32, y * 32))
 
-        pygame.display.update()
+            self.camera.update(self.player)
+
+            # update player, draw everything else
+            self.player.update()
+
+            for t in self.map:
+                self.screen.blit(t.image, camera.apply(t))
+
+            for e in self.entities:
+                self.screen.blit(e.image, camera.apply(e))
+
+            self.pygame.display.update()
+
+
+
+
 
 if __name__ == "__main__":
-    main()
+    game = Game()
+    game.run()

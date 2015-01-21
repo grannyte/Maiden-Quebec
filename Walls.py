@@ -3,16 +3,12 @@ __author__ = 'granyte'
 
 
 
-import spritesheet
-import os
-import pygame
-from pygame import *
 from tile import Tile
 
 
 class Walls(Tile):
-    def __init__(self, x, y):
-        Tile.__init__(self, x, y)
+    def __init__(self, x, y, spritesheet):
+        Tile.__init__(self, x, y, spritesheet)
         rect = (1*32, 2*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
 

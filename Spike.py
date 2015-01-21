@@ -1,19 +1,10 @@
 __author__ = 'granyte'
-
-
-
-import spritesheet
-import pygame
-from pygame import *
-from entity import Entity
 from tile import Tile
 
 
-
-
 class Spike(Tile):
-    def __init__(self, x, y):
-        Tile.__init__(self, x, y)
+    def __init__(self, x, y, spritesheet):
+        Tile.__init__(self, x, y, spritesheet)
         rect = (3*32, 3*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
 
