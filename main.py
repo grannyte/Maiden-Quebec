@@ -23,7 +23,6 @@ CAMERA_SLACK = 30
 
 class Game():
     def __init__(self):
-        global cameraX, cameraY
         self._init_pygame()
         self._init_game_variable()
         self._init_project_dir()
@@ -101,7 +100,7 @@ class Game():
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
                     raise SystemExit
                 else:
-                    self.player.control(e, self.platforms)
+                    self.player.control(e)
 
             # draw background
             for y in range(32):
@@ -111,7 +110,7 @@ class Game():
             self.camera.update(self.player)
 
             # update player, draw everything else
-            self.player.update()
+            self.player.update(self.platforms)
 
             for t in self.map:
                 self.screen.blit(t.image, camera.apply(t))

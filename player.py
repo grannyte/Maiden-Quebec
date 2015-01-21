@@ -4,8 +4,6 @@ import spritesheet
 import pygame
 from pygame import *
 from entity import Entity
-import exitblock
-import Spike
 
 
 class Player(Entity):
@@ -17,6 +15,7 @@ class Player(Entity):
         self.image = self._spritesheet.image_at(rect)
         self.image.set_colorkey((0, 0, 0))
         self.rect = Rect(x, y, 32, 32)
+        self.heading = pygame.math.Vector2(0, 0)
 
     def _init_project_dir(self):
         """Initialize project directory"""
@@ -29,23 +28,25 @@ class Player(Entity):
         ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
         self._spritesheet = spritesheet.Spritesheet(ss_path)
 
-    def update(self):
-        pass
+    def update(self, platforms):
+        self.rect.left += self.heading.x
+        self.rect.top += self.heading.y
+        self.collide(self.heading.x, self.heading.y, platforms)
+        if self.rect.left % 32 == 0:
+            self.heading.x = 0
+        if self.rect.top % 32 == 0:
+            self.heading.y = 0
 
-    def control(self, local_event, platforms):
+    def control(self, local_event):
         if local_event.type == pygame.KEYDOWN:
             if local_event.key == pygame.K_LEFT:
-                self.rect.left -= 32
-                self.collide(-32, 0, platforms)
+                self.heading.x -= 4
             elif local_event.key == pygame.K_RIGHT:
-                self.rect.left += 32
-                self.collide(32, 0, platforms)
+                self.heading.x += 4
             elif local_event.key == pygame.K_UP:
-                self.rect.top -= 32
-                self.collide(0, -32, platforms)
+                self.heading.y -= 4
             elif local_event.key == pygame.K_DOWN:
-                self.rect.top += 32
-                self.collide(0, 32, platforms)
+                self.heading.y += 4
 
 # Collision TRES temporaire jusqu'a l'implementation de l'octree ou autre
 

@@ -13,7 +13,7 @@ class Hero(pygame.sprite.Sprite):
         self.radius = 16  # collide check
 
     def update(self):
-       self.rect.center = self.pos
+        self.rect.center = self.pos
 
     def control(self, event):
         x, y = self.rect

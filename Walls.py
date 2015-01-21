@@ -1,8 +1,5 @@
 __author__ = 'granyte'
 
-
-
-
 from tile import Tile
 
 
