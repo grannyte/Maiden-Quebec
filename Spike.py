@@ -1,15 +1,18 @@
-# -*- coding: utf-8 -*-
+__author__ = 'granyte'
+
+
+
 import spritesheet
-import os
 import pygame
 from pygame import *
+from entity import Entity
 from platform import Platform
 
 
-class ExitBlock(Platform):
+
+
+class Spike(Platform):
     def __init__(self, x, y):
         Platform.__init__(self, x, y)
-        rect = (32*6, 2*32, 32, 32)
+        rect = (3*32, 3*32, 32, 32)
         self.image = self._spritesheet.image_at(rect)
-
-

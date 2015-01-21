@@ -5,6 +5,8 @@ from platform import Platform
 from exitblock import ExitBlock
 from camera import ComplexCamera
 from map import create_level
+from Spike import Spike
+
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
 HALF_WIDTH = int(WIN_WIDTH / 2)
@@ -22,8 +24,7 @@ def main():
     pygame.display.set_caption("Use arrows to move!")
     timer = pygame.time.Clock()
 
-    up = down = left = right = running = False
-    bg = Surface((32,32))
+    bg = Surface((32, 32))
     bg.convert()
     bg.fill(Color("#000000"))
     entities = pygame.sprite.Group()
@@ -38,6 +39,10 @@ def main():
         for col in row:
             if col == "P":
                 p = Platform(x, y)
+                platforms.append(p)
+                entities.add(p)
+            if col == "S":
+                p = Spike(x, y)
                 platforms.append(p)
                 entities.add(p)
             if col == "E":
@@ -63,7 +68,7 @@ def main():
             if e.type == KEYDOWN and e.key == K_ESCAPE:
                 raise SystemExit
             else:
-                player.control(e)
+                player.control(e, platforms)
 
         # draw background
         for y in range(32):
