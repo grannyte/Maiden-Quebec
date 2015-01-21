@@ -7,8 +7,8 @@ from tile import Tile
 from exitblock import ExitBlock
 from camera import ComplexCamera
 from map import create_level
-from Spike import Spike
-from Walls import Walls
+from spike import Spike
+from walls import Walls
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
