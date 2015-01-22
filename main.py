@@ -7,6 +7,8 @@ from tile import Tile
 from exitblock import ExitBlock
 from camera import ComplexCamera
 from map import create_level
+from map import LSystemMap
+from map import Gene
 from spike import Spike
 from walls import Walls
 
@@ -48,7 +50,7 @@ class Game():
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32, self._spritesheet)
+        self.player = Player(0, 32, self._spritesheet)
         self.platforms = []
 
     def _init_pygame(self):
@@ -62,7 +64,10 @@ class Game():
 
     def _load_level(self):
         x = y = 0
-        self.level = create_level()
+        local_map = LSystemMap(5, "TAA")
+        local_map.append_gene(Gene("A", "TA"))
+        self.level = local_map.buildmap(2, 2)
+            #create_level()
         # build the level
         for row in self.level:
             for col in row:
