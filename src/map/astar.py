@@ -3,9 +3,15 @@ from loader import Map
 
 def main():
     map = Map('test2.map')
-
-    a = AStar(map)
+    grid_def = {'start':'H', 'end':'E', 'wall':'#'}
+    a = AStar(map.grid, grid_def)
     a.process()
+
+    if(a.path_found):
+        a.display_path()
+        cells = a.get_path()
+        print(cells)
+
 
 class Cell(object):
     def __init__(self, x, y, reachable):
@@ -20,29 +26,31 @@ class Cell(object):
     def __lt__(self, other):
         return self.f < other.f
 
+
 class AStar(object):
-    def __init__(self, map):
+    def __init__(self, grid, grid_def):
         self.opened = []
         heapq.heapify(self.opened)
         self.closed = set()
         self.cells = []
-        self.grid = map.grid
-        self.grid_height = map.getNumberOfColumns()
-        self.grid_width = map.getNumberOfRows()
-        self.init_grid(map)
+        self.grid_def = grid_def
+        self.grid_height = len(grid[0])
+        self.grid_width = len(grid)
+        self.path_found = False
+        self.init_grid(grid)
 
-    def init_grid(self, map):
+    def init_grid(self, grid):
         for x in range(self.grid_width):
             for y in range(self.grid_height):
-                current_element = map.getElement(x,y)
-                if(current_element == '#'):
+                current_element = grid[x][y]
+                if(current_element == self.grid_def['wall']):
                     reachable = False
                 else:
                     reachable = True
                 self.cells.append(Cell(x, y, reachable))
-                if(current_element == 'H'):
+                if(current_element == self.grid_def['start']):
                     self.start = self.get_cell(x, y)
-                elif(current_element == 'E'):
+                elif(current_element == self.grid_def['end']):
                     self.end = self.get_cell(x, y)
 
     def get_heuristic(self, cell):
@@ -71,23 +79,18 @@ class AStar(object):
 
     def process(self):
         found_path = False
-
         # add cell to heap queue
         heapq.heappush(self.opened, (self.start.f, self.start))
         while len(self.opened):
             # pop cell from heap queue
             f, cell = heapq.heappop(self.opened)
-            print(cell.x, " ", cell.y, " ", cell.f)
-
+            print(cell.x, " ", cell.y, " ", cell.f) # TODO: REMOVE FOR PRODUCTION VERSION
             # add cell to closed list
             self.closed.add(cell)
-
             # if end cell, display found path
             if cell is self.end:
-                self.display_path()
-                found_path = True
+                self.path_found = True
                 break
-
             # get adjacent cells for cell
             adj_cells = self.get_adjacent_cells(cell)
             for adj_cell in adj_cells:
@@ -101,9 +104,6 @@ class AStar(object):
                         # add adj cell to open list
                         heapq.heappush(self.opened, (adj_cell.f, adj_cell))
 
-        if(not found_path):
-            print("No path found.")
-
     def display_path(self):
         cell = self.end
         print("path: cell: ",cell.x,", ", cell.y)
@@ -112,6 +112,17 @@ class AStar(object):
             print("path: cell: ",cell.x,", ", cell.y)
         cell = self.start
         print("path: cell: ",cell.x,", ", cell.y)
+
+    def get_path(self):
+        cells = []
+        cell = self.end
+        cells.append((cell.x, cell.y))
+        while cell.parent is not self.start:
+            cell = cell.parent
+            cells.append((cell.x, cell.y))
+        cell = self.start
+        cells.append((cell.x, cell.y))
+        return cells
 
 if __name__ == "__main__":
     main()
