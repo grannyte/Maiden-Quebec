@@ -47,26 +47,28 @@ class Turtle():
         self._heading_stack = []
 
     def memorise_heading(self):
-        self._heading_stack.append(self.heading)
+        self._heading_stack.append(pygame.math.Vector2(self.heading))
 
     def memorise_position(self):
-        self._position_stack.append(self.position)
+        self._position_stack.append(pygame.math.Vector2(self.position))
 
     def memorise_position_and_heading(self):
-        self._position_stack.append(self.position)
-        self._heading_stack.append(self.heading)
+        self._position_stack.append(pygame.math.Vector2(self.position))
+        self._heading_stack.append(pygame.math.Vector2(self.heading))
 
     def last_position(self):
-        self.position = self._position_stack.pop()
-
+        self.position = self._position_stack[-1]
+        del self._position_stack[-1]
 
     def last_heading(self):
-        self.heading = self._heading_stack.pop()
-
+        self.heading = self._heading_stack[-1]
+        del self._heading_stack[-1]
 
     def last_position_and_heading(self):
-        self.position = self._position_stack.pop()
-        self.heading = self._heading_stack.pop()
+        self.position = self._position_stack[-1]
+        del self._position_stack[-1]
+        self.heading = self._heading_stack[-1]
+        del self._heading_stack[-1]
 
 
 class LSystemMap():
@@ -84,7 +86,7 @@ class LSystemMap():
         for iteration in range(0, self.iterations):
             self.unfolded.append(self.unfolded[-1])
             for c in self.chromozomes:
-                self.unfolded[-1].replace(c.marker, c.unfold)
+                self.unfolded[-1] = self.unfolded[-1].replace(c.marker, c.unfold)
 
     def buildmap(self, sizex, sizey):
         l_map = []
@@ -97,5 +99,25 @@ class LSystemMap():
         return l_map
 
     def interpret(self, l_map):
-        turtle = Turtle(pygame.math.Vector2(0, 0), pygame.math.Vector2(1, 0))
-        l_map[int(turtle.position.x)][int(turtle.position.y)] = self.unfolded[-1][-1]
+        turtle = Turtle(pygame.math.Vector2(len(l_map)/2, len(l_map[0])/2), pygame.math.Vector2(1, 0))
+        for p in self.unfolded[-1]:
+            if l_map[min(max(int(turtle.position.x), 0), len(l_map)-1)][min(max(int(turtle.position.y), 0), len(l_map)-1)] != 'E':
+                l_map[min(max(int(turtle.position.x), 0), len(l_map)-1)][min(max(int(turtle.position.y), 0), len(l_map)-1)] = p
+            if p == '>':
+                turtle.heading.rotate_ip(90)
+            elif p == '<':
+                turtle.heading.rotate_ip(-90)
+            elif p == '[':
+                turtle.memorise_position()
+            elif p == ']':
+                turtle.last_position()
+            elif p == '(':
+                turtle.memorise_heading()
+            elif p == ')':
+                turtle.last_heading()
+            elif p == '{':
+                turtle.memorise_position_and_heading()
+            elif p == '}':
+                turtle.last_position_and_heading()
+            turtle.position += turtle.heading
+
