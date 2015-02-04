@@ -12,8 +12,8 @@ from map import Gene
 from spike import Spike
 from walls import Walls
 
-WIN_WIDTH = 800
-WIN_HEIGHT = 640
+WIN_WIDTH = 1920
+WIN_HEIGHT = 1080
 HALF_WIDTH = int(WIN_WIDTH / 2)
 HALF_HEIGHT = int(WIN_HEIGHT / 2)
 
@@ -50,7 +50,7 @@ class Game():
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(0, 32, self._spritesheet)
+        self.player = Player(50*32, 50*32, self._spritesheet)
         self.platforms = []
 
     def _init_pygame(self):
@@ -64,9 +64,16 @@ class Game():
 
     def _load_level(self):
         x = y = 0
-        local_map = LSystemMap(5, "TAA")
-        local_map.append_gene(Gene("A", "TA"))
-        self.level = local_map.buildmap(2, 2)
+        local_map = LSystemMap(3, "{ATA>{ATEAS}}<A")
+
+        local_map.append_gene(Gene("T", "TTT"))
+        local_map.append_gene(Gene("A", ">{AT<}"))
+        local_map.append_gene(Gene("TT", "[TA]T"))
+        local_map.append_gene(Gene("AT", "(AT)"))
+        local_map.append_gene(Gene("TA", "{TAS}"))
+        local_map.append_gene(Gene("S", "{<TAS}"))
+        local_map.append_gene(Gene("E", "{<TES}"))
+        self.level = local_map.buildmap(100, 100)
             #create_level()
         # build the level
         for row in self.level:
