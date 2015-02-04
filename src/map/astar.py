@@ -1,17 +1,4 @@
 import heapq
-from loader import Map
-
-def main():
-    map = Map('test2.map')
-    grid_def = {'start':'H', 'end':'E', 'wall':'#'}
-
-    a = Search(map.grid, grid_def)
-    a.process()
-    if(a.path_found):
-        a.display_path()
-        cells = a.get_path()
-        print(cells)
-
 
 class Cell(object):
     def __init__(self, x, y, reachable):
@@ -66,9 +53,9 @@ class AStar(object):
 
 
 class Search(AStar):
-    def __init__(self, grid, grid_def):
+    def __init__(self, grid):
         self.cells = []
-        self.grid_def = grid_def
+        self.grid_def = {'start':'H', 'end':'E', 'wall':'#'}
         self.grid_height = len(grid[0])
         self.grid_width = len(grid)
         self.path_found = False
@@ -119,6 +106,19 @@ class Search(AStar):
             cell = self.start
             print("path: cell: ",cell.x,", ", cell.y)
 
+    def display_path_as_grid(self):
+        path = self.get_path()
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
+                cell = self.get_cell(x,y)
+                if((x,y) in path):
+                    print("o", end="")
+                elif(cell.reachable):
+                    print(" ", end="")
+                else:
+                    print("#", end="")
+            print()
+
     def get_path(self):
         cells = []
         if(self.path_found):
@@ -130,8 +130,4 @@ class Search(AStar):
             cell = self.start
             cells.append((cell.x, cell.y))
         return cells
-
-
-if __name__ == "__main__":
-    main()
 

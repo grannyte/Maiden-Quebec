@@ -21,5 +21,11 @@ class Map:
                 if(self.grid[row][col] == element):
                     return row, col
 
+    def print_as_grid(self):
+        for row in range(len(self.grid)):
+            for col in range(len(self.grid[0])):
+                print(self.getElement(row,col),end="")
+            print()
+
     def __str__(self):
         return ''.join(str(item) for line in self.grid for item in line)
