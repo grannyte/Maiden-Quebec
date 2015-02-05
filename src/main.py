@@ -1,92 +1,129 @@
-# -*- coding: utf-8 -*-
-
+import pygame
+import spritesheet
 import os
-import sys
-import argparse
-from map.loader import Map
+from pygame import *
+from player import Player
+from tile import Tile
+from exitblock import ExitBlock
+from camera import ComplexCamera
+from map import create_level
+from spike import Spike
+from walls import Walls
 
-SCREEN_SIZE_ROW = 16
-SCREEN_SIZE_COL = 60
-SCREEN_CENTER_ROW = 8
-SCREEN_CENTER_COL = 30
-MAP_LIST = [ 'level00.map',
-             'test2.map']
+WIN_WIDTH = 800
+WIN_HEIGHT = 640
+HALF_WIDTH = int(WIN_WIDTH / 2)
+HALF_HEIGHT = int(WIN_HEIGHT / 2)
 
-def main():
-    parser = argparse.ArgumentParser(description='Text-based game')
-    parser.add_argument('-i', '--irrlicht',
-                        help='Irrlicht manages graphics(Not implemented yet)',
-                        action='store_true')
-    parser.parse_args()
+DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
+DEPTH = 32
+FLAGS = 0
+CAMERA_SLACK = 30
 
-    try:
-        launch()
-    except ExceptionGameComplete as e:
-        print(e)
 
-def launch():
-    current_map = 0
-    map_complete = True
+class Game():
+    def __init__(self):
+        self._init_pygame()
+        self._init_project_dir()
+        self._init_spritesheet()
+        self._init_game_variable()
+        self._load_level()
 
-    while(map_complete):
-        try:
-            map = Map(MAP_LIST[current_map])
-        except IndexError as e:
-            raise ExceptionGameComplete('Congratulations! Game complete!')
+        self.camera = ComplexCamera(self.total_level_width, self.total_level_height, WIN_WIDTH, WIN_HEIGHT)
 
-        heroe_pos_row, heroe_pos_col = map.getPositionElement('H')
-        exit_pos_row, exit_pos_col = map.getPositionElement('E')
-        map_complete = False
+        self.run(self.camera)
 
-        command = ''
-        while(command != 'q' and map_complete is False):
-            clear_screen()
+    def _init_project_dir(self):
+        """Initialize project directory"""
+        full_path = os.path.realpath(__file__)
+        self._project_dir = os.path.dirname(full_path)
 
-            first_map_row = SCREEN_CENTER_ROW - heroe_pos_row
-            first_map_col = SCREEN_CENTER_COL - heroe_pos_col
-            last_map_row = first_map_row + map.getNumberOfRows() - 1
-            last_map_col = first_map_col + map.getNumberOfColumns() - 1
+    def _init_spritesheet(self):
+        """Initialize spritesheet"""
+        spritesheets = ["fantasy-tileset.png"]
+        ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
+        self._spritesheet = spritesheet.Spritesheet(ss_path)
 
-            for screen_row in range(SCREEN_SIZE_ROW):
-                for screen_col in range(SCREEN_SIZE_COL):
-                    map_row = screen_row - first_map_row
-                    map_col = screen_col - first_map_col
-                    if(map_row == heroe_pos_row and map_col == heroe_pos_col):
-                        print('H',end="")
-                    elif(screen_row >= first_map_row and screen_col >= first_map_col and
-                            screen_row <= last_map_row and screen_col <= last_map_col):
-                        element = map.getElement(map_row,map_col)
-                        if(element != 'H'):
-                            print(element, end="")
-                        else:
-                            print(' ', end="")
-                    else:
-                        print('.', end="")
-                print('')
+    def _init_game_variable(self):
+        self.timer = pygame.time.Clock()
+        self.map = pygame.sprite.Group()
+        self.entities = pygame.sprite.Group()
+        self.player = Player(32, 32, self._spritesheet)
+        self.platforms = []
 
-            # TODO: REAL MOVEMENT IMPLANTATION
-            command = read_command()
-            if(command == 's' and map.getElement(heroe_pos_row + 1,heroe_pos_col) != '#'):
-                heroe_pos_row = heroe_pos_row + 1
-            elif(command == 'w' and map.getElement(heroe_pos_row - 1,heroe_pos_col) != '#'):
-                heroe_pos_row = heroe_pos_row - 1
-            elif(command == 'a' and map.getElement(heroe_pos_row,heroe_pos_col - 1) != '#'):
-                heroe_pos_col = heroe_pos_col - 1
-            elif(command == 'd' and map.getElement(heroe_pos_row,heroe_pos_col + 1) != '#'):
-                heroe_pos_col = heroe_pos_col + 1
+    def _init_pygame(self):
+        self.pygame = pygame
+        self.pygame.init()
+        self.screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
+        self.pygame.display.set_caption("Use arrows to move!")
+        self.bg = Surface((32, 32))
+        self.bg.convert()
+        self.bg.fill(Color("#000000"))
 
-            if(heroe_pos_row == exit_pos_row and heroe_pos_col == exit_pos_col):
-                map_complete = True
-                current_map += 1
+    def _load_level(self):
+        x = y = 0
+        self.level = create_level()
+        # build the level
+        for row in self.level:
+            for col in row:
+                if col == "P":
+                    p = Walls(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.entities.add(p)
+                elif col == "S":
+                    p = Spike(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.entities.add(p)
+                elif col == "E":
+                    e = ExitBlock(x, y, self._spritesheet)
+                    self.platforms.append(e)
+                    self.entities.add(e)
+                else:
+                    p = Tile(x, y, self._spritesheet)
+                    self.platforms.append(p)
+                    self.map.add(p)
+                x += 32
+            y += 32
+            x = 0
+        self.total_level_width = len(self.level[0]) * 32
+        self.total_level_height = len(self.level) * 32
+        self.entities.add(self.player)
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    def run(self, camera):
+        is_running = True
+        while is_running:
+            self.timer.tick(60)
 
-def read_command():
-    return sys.stdin.read(1)
+            for e in pygame.event.get():
+                if e.type == QUIT:
+                    raise SystemExit
+                if e.type == KEYDOWN and e.key == K_ESCAPE:
+                    raise SystemExit
+                else:
+                    self.player.control(e)
 
-class ExceptionGameComplete(Exception):
-    pass
+            # draw background
+            for y in range(32):
+                for x in range(32):
+                    self.screen.blit(self.bg, (x * 32, y * 32))
+
+            self.camera.update(self.player)
+
+            # update player, draw everything else
+            self.player.update(self.platforms)
+
+            for t in self.map:
+                self.screen.blit(t.image, camera.apply(t))
+
+            for e in self.entities:
+                self.screen.blit(e.image, camera.apply(e))
+
+            self.pygame.display.update()
+
+
+
+
 
 if __name__ == "__main__":
-    main()
+    game = Game()
+    game.run()
