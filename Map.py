@@ -99,7 +99,7 @@ class LSystemMap():
         return l_map
 
     def interpret(self, l_map):
-        turtle = Turtle(pygame.math.Vector2(len(l_map)/2, len(l_map[0])/2), pygame.math.Vector2(1, 0))
+        turtle = Turtle(pygame.math.Vector2(len(l_map)/4, len(l_map[0])/4), pygame.math.Vector2(1, 0))
         for p in self.unfolded[-1]:
             if l_map[min(max(int(turtle.position.x), 0), len(l_map)-1)][min(max(int(turtle.position.y), 0), len(l_map)-1)] != 'E':
                 l_map[min(max(int(turtle.position.x), 0), len(l_map)-1)][min(max(int(turtle.position.y), 0), len(l_map)-1)] = p

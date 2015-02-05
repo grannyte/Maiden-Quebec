@@ -50,7 +50,7 @@ class Game():
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(50*32, 50*32, self._spritesheet)
+        self.player = Player(25*32, 25*32, self._spritesheet)
         self.platforms = []
 
     def _init_pygame(self):
@@ -64,7 +64,7 @@ class Game():
 
     def _load_level(self):
         x = y = 0
-        local_map = LSystemMap(3, "{ATA>{ATEAS}}<A")
+        local_map = LSystemMap(3, "{ATA>{ATATES}}<A")
 
         local_map.append_gene(Gene("T", "TTT"))
         local_map.append_gene(Gene("A", ">{AT<}"))
@@ -73,7 +73,7 @@ class Game():
         local_map.append_gene(Gene("TA", "{TAS}"))
         local_map.append_gene(Gene("S", "{<TAS}"))
         local_map.append_gene(Gene("E", "{<TES}"))
-        self.level = local_map.buildmap(100, 100)
+        self.level = local_map.buildmap(50, 50)
             #create_level()
         # build the level
         for row in self.level:
