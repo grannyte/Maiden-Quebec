@@ -46,6 +46,12 @@ class Game():
         ss_rogue = os.path.join('', *[self._project_dir, 'data', spritesheets['rogue']])
         self._ss_rogue = spritesheet.Spritesheet(ss_rogue)
 
+    def _init_music(self):
+        musics = {'donjon': 'dark_theme.ogg'}
+        donjon = os.path.join('', *[self._project_dir, 'data', musics['donjon']])
+        pygame.mixer.music.load(donjon)
+        pygame.mixer.music.play(-1)
+
     def _init_game_variable(self):
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
@@ -55,6 +61,7 @@ class Game():
 
     def _init_pygame(self):
         self.pygame = pygame
+        self.pygame.mixer.pre_init(44100, -16, 2, 2048)
         self.pygame.init()
         self.screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
         self.pygame.display.set_caption("Maiden Quebec")
@@ -90,6 +97,7 @@ class Game():
         self.total_level_width = len(self.level[0]) * 64
         self.total_level_height = len(self.level) * 64
         self.entities.add(self.player)
+        self._init_music()
 
     def run(self, camera):
         is_running = True
