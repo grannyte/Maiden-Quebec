@@ -21,56 +21,57 @@ class Player(Entity):
         self._action = 'walk'
         self._facing = '_south'
         self._animations = self._spritesheet[self._action + self._facing]
+        self.ticks = 0
 
-    def update(self, platforms):
+    def update(self, platforms, since_last_tick):
         if self._is_standing_still:
             self.image = self._spritesheet[self._action + self._facing][0]
-        else:
-
+        elif self.ticks == 0: # The action was approved during control test
             self.image = self._animations[self._frame]
             self._frame += 1
             self._frame %= len(self._animations)
-        # self.rect.left += self.heading.x
-        # self.rect.top += self.heading.y
-        # self.collide(self.heading.x, self.heading.y, platforms)
-        # if self.rect.left % 64 == 0:
-        #     self.heading.x = 0
-        # if self.rect.top % 64 == 0:
-        #     self.heading.y = 0
+            self.rect.left += self._heading.x
+            self.rect.top += self._heading.y
+            self.collide(self._heading.x, self._heading.y, platforms)
 
-    def control(self, pressed):
-        if pressed[pygame.K_LEFT]:
-            self._heading.x = -64
-            self._action = 'walk'
-            self._facing = '_west'
-            self._animations = self._spritesheet[self._action + self._facing]
-            self._is_standing_still = False
-        elif pressed[pygame.K_RIGHT]:
-            self._heading.x = 64
-            self._action = 'walk'
-            self._facing = '_est'
-            self._animations = self._spritesheet[self._action + self._facing]
-            self._is_standing_still = False
-        elif pressed[pygame.K_UP]:
-            self._heading.y = -64
-            self._action = 'walk'
-            self._facing = '_north'
-            self._animations = self._spritesheet[self._action + self._facing]
-            self._is_standing_still = False
-        elif pressed[pygame.K_DOWN]:
-            self._heading.y = 64
-            self._action = 'walk'
-            self._facing = '_south'
-            self._animations = self._spritesheet[self._action + self._facing]
-            self._is_standing_still = False
-        elif pressed[pygame.K_s]:
-            self._is_standing_still = True
-            pass  # TODO: status HUD
-        elif pressed[pygame.K_i]:
-            self._is_standing_still = True
-            pass  # TODO: inventory HUD
-        else:
-            self._is_standing_still = True
+    def control(self, pressed, since_last_tick):
+        self.ticks += since_last_tick
+        self._heading.x = 0
+        self._heading.y = 0
+        if self.ticks >= 1000.0 / len(self._animations):
+            if pressed[pygame.K_LEFT]:
+                self._action = 'walk'
+                self._facing = '_west'
+                self._animations = self._spritesheet[self._action + self._facing]
+                self._heading.x = -64 / len(self._animations)
+                self._is_standing_still = False
+            elif pressed[pygame.K_RIGHT]:
+                self._action = 'walk'
+                self._facing = '_est'
+                self._animations = self._spritesheet[self._action + self._facing]
+                self._heading.x = 64 / len(self._animations)
+                self._is_standing_still = False
+            elif pressed[pygame.K_UP]:
+                self._action = 'walk'
+                self._facing = '_north'
+                self._animations = self._spritesheet[self._action + self._facing]
+                self._heading.y = -64 / len(self._animations)
+                self._is_standing_still = False
+            elif pressed[pygame.K_DOWN]:
+                self._action = 'walk'
+                self._facing = '_south'
+                self._animations = self._spritesheet[self._action + self._facing]
+                self._heading.y = 64 / len(self._animations)
+                self._is_standing_still = False
+            elif pressed[pygame.K_s]:
+                self._is_standing_still = True
+                pass  # TODO: status HUD
+            elif pressed[pygame.K_i]:
+                self._is_standing_still = True
+                pass  # TODO: inventory HUD
+            else:
+                self._is_standing_still = True
+            self.ticks = 0
 
     # TODO: Améliorer la détection des colisions
     def collide(self, xvel, yvel, platforms):

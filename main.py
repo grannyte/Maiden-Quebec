@@ -10,6 +10,7 @@ from map import create_level
 from spike import Spike
 from wall import Walls
 
+_FPS = (60,)
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
 HALF_WIDTH = int(WIN_WIDTH / 2)
@@ -102,8 +103,9 @@ class Game():
     def run(self, camera):
         is_running = True
         pygame.key.set_repeat(50, 50)
+        tick_per_sec = 1000.0 % _FPS[0]
         while is_running:
-            self.timer.tick(60)
+            self.timer.tick(_FPS[0])
 
             for e in pygame.event.get():
                 if e.type == QUIT:
@@ -115,7 +117,7 @@ class Game():
 
             if pygame.key.get_focused():
                 pressed = pygame.key.get_pressed()
-                self.player.control(pressed)
+                self.player.control(pressed, tick_per_sec)
 
             # draw background
             for y in range(64):
@@ -125,7 +127,7 @@ class Game():
             self.camera.update(self.player)
 
             # update player, draw everything else
-            self.player.update(self.platforms)
+            self.player.update(self.platforms, tick_per_sec)
 
             for t in self.map:
                 self.screen.blit(t.image, camera.apply(t))
