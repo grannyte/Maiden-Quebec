@@ -26,20 +26,19 @@ class Player(Entity):
         if self.rect.top % 64 == 0:
             self.heading.y = 0
 
-    def control(self, local_event):
-        if local_event.type == pygame.KEYDOWN:
-            if local_event.key == pygame.K_LEFT:
-                self.heading.x -= 4
-            elif local_event.key == pygame.K_RIGHT:
-                self.heading.x += 4
-            elif local_event.key == pygame.K_UP:
-                self.heading.y -= 4
-            elif local_event.key == pygame.K_DOWN:
-                self.heading.y += 4
-            elif local_event.key == pygame.K_s:
-                self.heading.y += 4 # TODO: status HUD
-            elif local_event.key == pygame.K_i:
-                self.heading.y += 4 # TODO: inventory HUD
+    def control(self, pressed):
+        if pressed[pygame.K_LEFT]:
+            self.heading.x -= 4
+        elif pressed[pygame.K_RIGHT]:
+            self.heading.x += 4
+        elif pressed[pygame.K_UP]:
+            self.heading.y -= 4
+        elif pressed[pygame.K_DOWN]:
+            self.heading.y += 4
+        elif pressed[pygame.K_s]:
+            self.heading.y += 4  # TODO: status HUD
+        elif pressed[pygame.K_i]:
+            self.heading.y += 4  # TODO: inventory HUD
 
 # Collision TRES temporaire jusqu'a l'implementation de l'octree ou autre
 

@@ -93,6 +93,7 @@ class Game():
 
     def run(self, camera):
         is_running = True
+        pygame.key.set_repeat(50, 50)
         while is_running:
             self.timer.tick(60)
 
@@ -101,8 +102,12 @@ class Game():
                     raise SystemExit
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
                     raise SystemExit
-                else:
-                    self.player.control(e)
+                #else:
+                #    self.player.control(e)
+
+            if pygame.key.get_focused():
+                pressed = pygame.key.get_pressed()
+                self.player.control(pressed)
 
             # draw background
             for y in range(64):
