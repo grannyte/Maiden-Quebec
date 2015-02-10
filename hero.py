@@ -7,9 +7,9 @@ class Hero(pygame.sprite.Sprite):
 
     def __init__(self, spritesheet, group):
         pygame.sprite.Sprite.__init__(self, group)
-        rect = (0, 18*32, 32, 32)
+        rect = (0, 0, 64, 64)
         self.image = spritesheet.image_at(rect)
-        self.rect = (100, 100) #  sprite pos on the screen
+        self.rect = (256, 256) #  sprite pos on the screen
         self.radius = 16  # collide check
 
     def update(self):
@@ -19,11 +19,11 @@ class Hero(pygame.sprite.Sprite):
         x, y = self.rect
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                x -= 32
+                x -= 64
             elif event.key == pygame.K_RIGHT:
-                x += 32
+                x += 64
             elif event.key == pygame.K_UP:
-                y -= 32
+                y -= 64
             elif event.key == pygame.K_DOWN:
-                y += 32
+                y += 64
         self.rect = (x, y)

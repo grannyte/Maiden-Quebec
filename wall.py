@@ -6,7 +6,7 @@ from tile import Tile
 class Walls(Tile):
     def __init__(self, x, y, spritesheet):
         Tile.__init__(self, x, y, spritesheet)
-        rect = (1*32, 2*32, 32, 32)
+        rect = (0, 3*64, 64, 64)
         self.image = self._spritesheet.image_at(rect)
 
     def collide(self, p, xvel, yvel):

@@ -40,23 +40,25 @@ class Game():
 
     def _init_spritesheet(self):
         """Initialize spritesheet"""
-        spritesheets = ["fantasy-tileset.png"]
-        ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
-        self._spritesheet = spritesheet.Spritesheet(ss_path)
+        spritesheets = {'rpg': 'wall.png', 'rogue': 'rogue.png'}
+        ss_rpg = os.path.join('', *[self._project_dir, 'data', spritesheets['rpg']])
+        self._ss_rpg = spritesheet.Spritesheet(ss_rpg)
+        ss_rogue = os.path.join('', *[self._project_dir, 'data', spritesheets['rogue']])
+        self._ss_rogue = spritesheet.Spritesheet(ss_rogue)
 
     def _init_game_variable(self):
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32, self._spritesheet)
+        self.player = Player(64, 64, self._ss_rogue)
         self.platforms = []
 
     def _init_pygame(self):
         self.pygame = pygame
         self.pygame.init()
         self.screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
-        self.pygame.display.set_caption("Use arrows to move!")
-        self.bg = Surface((32, 32))
+        self.pygame.display.set_caption("Maiden Quebec")
+        self.bg = Surface((64, 64))
         self.bg.convert()
         self.bg.fill(Color("#000000"))
 
@@ -67,26 +69,26 @@ class Game():
         for row in self.level:
             for col in row:
                 if col == "P":
-                    p = Walls(x, y, self._spritesheet)
+                    p = Walls(x, y, self._ss_rpg)
                     self.platforms.append(p)
                     self.entities.add(p)
                 elif col == "S":
-                    p = Spike(x, y, self._spritesheet)
+                    p = Spike(x, y, self._ss_rpg)
                     self.platforms.append(p)
                     self.entities.add(p)
                 elif col == "E":
-                    e = ExitBlock(x, y, self._spritesheet)
+                    e = ExitBlock(x, y, self._ss_rpg)
                     self.platforms.append(e)
                     self.entities.add(e)
                 else:
-                    p = Tile(x, y, self._spritesheet)
+                    p = Tile(x, y, self._ss_rpg)
                     self.platforms.append(p)
                     self.map.add(p)
-                x += 32
-            y += 32
+                x += 64
+            y += 64
             x = 0
-        self.total_level_width = len(self.level[0]) * 32
-        self.total_level_height = len(self.level) * 32
+        self.total_level_width = len(self.level[0]) * 64
+        self.total_level_height = len(self.level) * 64
         self.entities.add(self.player)
 
     def run(self, camera):
@@ -103,9 +105,9 @@ class Game():
                     self.player.control(e)
 
             # draw background
-            for y in range(32):
-                for x in range(32):
-                    self.screen.blit(self.bg, (x * 32, y * 32))
+            for y in range(64):
+                for x in range(64):
+                    self.screen.blit(self.bg, (x * 64, y * 64))
 
             self.camera.update(self.player)
 
@@ -118,10 +120,25 @@ class Game():
             for e in self.entities:
                 self.screen.blit(e.image, camera.apply(e))
 
+            #draw head's up display
+            # initialize font; must be called after 'pygame.init()' to avoid 'Font not Initialized' error
+            hud_font = pygame.font.SysFont("monospace", 16)
+            hud_font.set_bold(True)
+
+            # HP
+            label = hud_font.render("HP", 1, (255, 0, 0))
+            self.screen.blit(label, (2, 4))
+            pygame.draw.rect(self.screen, (255, 0, 0), (32, 9, 128, 8))
+            # MP
+            label = hud_font.render("MP", 1, (0, 0, 255))
+            self.screen.blit(label, (2, 20))
+            pygame.draw.rect(self.screen, (0, 0, 255), (32, 24, 128, 8))
+            # XP
+            label = hud_font.render("XP", 1, (0, 255, 0))
+            self.screen.blit(label, (2, 38))
+            pygame.draw.rect(self.screen, (0, 255, 0), (32, 42, 128, 8))
+
             self.pygame.display.update()
-
-
-
 
 
 if __name__ == "__main__":
