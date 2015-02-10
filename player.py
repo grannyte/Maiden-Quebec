@@ -14,34 +14,63 @@ class Player(Entity):
         rect = (0, 0, 64, 64)
         self.image = spritesheet.image_at(rect)
         self.rect = Rect(x, y, 64, 64)
-        self.heading = pygame.math.Vector2(0, 0)
+        self._heading = pygame.math.Vector2(0, 0)
         # actions
         self._is_standing_still = True
-        self._action = 'walk_south'
-        self.image = self._spritesheet[self._action][0]
+        self._frame = 0
+        self._action = 'walk'
+        self._facing = '_south'
+        self._animations = self._spritesheet[self._action + self._facing]
 
     def update(self, platforms):
-        self.rect.left += self.heading.x
-        self.rect.top += self.heading.y
-        self.collide(self.heading.x, self.heading.y, platforms)
-        if self.rect.left % 64 == 0:
-            self.heading.x = 0
-        if self.rect.top % 64 == 0:
-            self.heading.y = 0
+        if self._is_standing_still:
+            self.image = self._spritesheet[self._action + self._facing][0]
+        else:
+
+            self.image = self._animations[self._frame]
+            self._frame += 1
+            self._frame %= len(self._animations)
+        # self.rect.left += self.heading.x
+        # self.rect.top += self.heading.y
+        # self.collide(self.heading.x, self.heading.y, platforms)
+        # if self.rect.left % 64 == 0:
+        #     self.heading.x = 0
+        # if self.rect.top % 64 == 0:
+        #     self.heading.y = 0
 
     def control(self, pressed):
         if pressed[pygame.K_LEFT]:
-            self.heading.x -= 1
+            self._heading.x = -64
+            self._action = 'walk'
+            self._facing = '_west'
+            self._animations = self._spritesheet[self._action + self._facing]
+            self._is_standing_still = False
         elif pressed[pygame.K_RIGHT]:
-            self.heading.x += 1
+            self._heading.x = 64
+            self._action = 'walk'
+            self._facing = '_est'
+            self._animations = self._spritesheet[self._action + self._facing]
+            self._is_standing_still = False
         elif pressed[pygame.K_UP]:
-            self.heading.y -= 1
+            self._heading.y = -64
+            self._action = 'walk'
+            self._facing = '_north'
+            self._animations = self._spritesheet[self._action + self._facing]
+            self._is_standing_still = False
         elif pressed[pygame.K_DOWN]:
-            self.heading.y += 1
+            self._heading.y = 64
+            self._action = 'walk'
+            self._facing = '_south'
+            self._animations = self._spritesheet[self._action + self._facing]
+            self._is_standing_still = False
         elif pressed[pygame.K_s]:
-            self.heading.y += 1  # TODO: status HUD
+            self._is_standing_still = True
+            pass  # TODO: status HUD
         elif pressed[pygame.K_i]:
-            self.heading.y += 1  # TODO: inventory HUD
+            self._is_standing_still = True
+            pass  # TODO: inventory HUD
+        else:
+            self._is_standing_still = True
 
     # TODO: Améliorer la détection des colisions
     def collide(self, xvel, yvel, platforms):
