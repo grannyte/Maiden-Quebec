@@ -67,7 +67,7 @@ class Game():
         self.pygame.display.set_caption("Maiden Quebec")
         self.bg = Surface((64, 64))
         self.bg.convert()
-        self.bg.fill(Color("#000000"))
+        self.bg.fill((0, 0, 0))
 
     def _load_level(self):
         x = y = 0
