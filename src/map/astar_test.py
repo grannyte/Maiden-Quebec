@@ -1,4 +1,4 @@
-from loader import Map
+from map import Map
 from astar import Search
 
 def main():
