@@ -35,7 +35,7 @@ class LifeForm(Entity):
         rects = [Rect(x, 2 * tile_size, tile_size, tile_size) for x in range(0, 7 * tile_size, tile_size)]
         self._sprite_sheet['cast_south'] = spritesheet.images_at(rects, self._colorkey)
         rects = [Rect(x, 3 * tile_size, tile_size, tile_size) for x in range(0, 7 * tile_size, tile_size)]
-        self._sprite_sheet['cast_est'] = spritesheet.images_at(rects, self._colorkey)
+        self._sprite_sheet['cast_east'] = spritesheet.images_at(rects, self._colorkey)
         # spear thrust
         rects = [Rect(x, 4 * tile_size, tile_size, tile_size) for x in range(0, 8 * tile_size, tile_size)]
         self._sprite_sheet['thrust_north'] = spritesheet.images_at(rects, self._colorkey)
@@ -44,7 +44,7 @@ class LifeForm(Entity):
         rects = [Rect(x, 6 * tile_size, tile_size, tile_size) for x in range(0, 8 * tile_size, tile_size)]
         self._sprite_sheet['thrust_south'] = spritesheet.images_at(rects, self._colorkey)
         rects = [Rect(x, 7 * tile_size, tile_size, tile_size) for x in range(0, 8 * tile_size, tile_size)]
-        self._sprite_sheet['thrust_est'] = spritesheet.images_at(rects, self._colorkey)
+        self._sprite_sheet['thrust_east'] = spritesheet.images_at(rects, self._colorkey)
         # walk
         rects = [Rect(x, 8 * tile_size, tile_size, tile_size) for x in range(0, 9 * tile_size, tile_size)]
         self._sprite_sheet['walk_north'] = spritesheet.images_at(rects, self._colorkey)
@@ -53,7 +53,7 @@ class LifeForm(Entity):
         rects = [Rect(x, 10 * tile_size, tile_size, tile_size) for x in range(0, 9 * tile_size, tile_size)]
         self._sprite_sheet['walk_south'] = spritesheet.images_at(rects, self._colorkey)
         rects = [Rect(x, 11 * tile_size, tile_size, tile_size) for x in range(0, 9 * tile_size, tile_size)]
-        self._sprite_sheet['walk_est'] = spritesheet.images_at(rects, self._colorkey)
+        self._sprite_sheet['walk_east'] = spritesheet.images_at(rects, self._colorkey)
         # attack
         rects = [Rect(x, 12 * tile_size, tile_size, tile_size) for x in range(0, 6 * tile_size, tile_size)]
         self._sprite_sheet['attack_north'] = spritesheet.images_at(rects, self._colorkey)
@@ -62,7 +62,7 @@ class LifeForm(Entity):
         rects = [Rect(x, 14 * tile_size, tile_size, tile_size) for x in range(0, 6 * tile_size, tile_size)]
         self._sprite_sheet['attack_south'] = spritesheet.images_at(rects, self._colorkey)
         rects = [Rect(x, 15 * tile_size, tile_size, tile_size) for x in range(0, 6 * tile_size, tile_size)]
-        self._sprite_sheet['attack_est'] = spritesheet.images_at(rects, self._colorkey)
+        self._sprite_sheet['attack_east'] = spritesheet.images_at(rects, self._colorkey)
         # bow
         rects = [Rect(x, 12 * tile_size, tile_size, tile_size) for x in range(0, 13 * tile_size, tile_size)]
         self._sprite_sheet['bow_north'] = spritesheet.images_at(rects, self._colorkey)
@@ -71,7 +71,7 @@ class LifeForm(Entity):
         rects = [Rect(x, 14 * tile_size, tile_size, tile_size) for x in range(0, 13 * tile_size, tile_size)]
         self._sprite_sheet['bow_south'] = spritesheet.images_at(rects, self._colorkey)
         rects = [Rect(x, 15 * tile_size, tile_size, tile_size) for x in range(0, 13 * tile_size, tile_size)]
-        self._sprite_sheet['bow_est'] = spritesheet.images_at(rects, self._colorkey)
+        self._sprite_sheet['bow_east'] = spritesheet.images_at(rects, self._colorkey)
         # die
         rects = [Rect(x, 12 * tile_size, tile_size, tile_size) for x in range(0, 6 * tile_size, tile_size)]
         self._sprite_sheet['die_south'] = spritesheet.images_at(rects, self._colorkey)

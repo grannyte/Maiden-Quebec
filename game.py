@@ -8,11 +8,15 @@ from src.camera import ComplexCamera
 from src.hud.hud_health import HudHealth
 from src.sprite.hero import Hero
 from src.map.temple import Temple
+from client import Client
 
 from os.path import realpath, dirname
 
 
 class Game():
+    """
+    Run the game with local resource and get extra from server (players, monsters, drops, quests)
+    """
     def __init__(self, project_directory):
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
@@ -23,14 +27,18 @@ class Game():
         self.camera = ComplexCamera(1024, 768, 800, 600)
         self._hud_health = HudHealth()
 
+        # TODO: Client should get updates from server
         self.player = Hero(8, 8, 64, project_directory)
         self.entities = sprite.Group()
         self.entities.add(self.player)
 
         self.location = Temple(project_directory)
         self.sprites = sprite.Group()
-        for tile in self.location.tile_iterator():
+        for tile in self.location.tiles_iterator():
             self.sprites.add(tile)
+        self.blocks = sprite.Group()
+        for block in self.location.blocks_iterator():
+            self.blocks.add(block)
 
 
     def run(self):
@@ -48,11 +56,13 @@ class Game():
                 pressed = pygame.key.get_pressed()
                 self.player.control(pressed)
 
+            # TODO: AI
+
             self._update()
             self._draw()
 
     def _update(self):
-        self.entities.update()
+        self.entities.update(self.blocks)
         self.sprites.update()
         self.camera.update(self.player)
 

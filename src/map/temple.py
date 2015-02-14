@@ -16,6 +16,8 @@ class Temple(Map):
     """
     def __init__(self, project_dir):
         Map.__init__(self)
+        self._tiles = []
+        self._walls = []  # Use for collision
         self._parse_sprite_sheet(join(project_dir, 'data', 'img', 'temple.png'))
         self._build()
 
@@ -43,7 +45,9 @@ class Temple(Map):
                 if col == ' ':
                     self._tiles.append(floor.Floor(x, y, self._tile_size, self._sprite_sheet['floor']))
                 elif col == '#':
-                    self._tiles.append(wall.Wall(x, y, self._tile_size, self._sprite_sheet['wall']))
+                    w = wall.Wall(x, y, self._tile_size, self._sprite_sheet['wall'])
+                    self._walls.append(w)
+                    self._tiles.append(w)
                 elif col == 'D':
                     self._tiles.append(door.Door(x, y, self._tile_size, self._sprite_sheet['door']))
                 else:
@@ -51,9 +55,17 @@ class Temple(Map):
                 x += 1
             y += 1
 
-    def tile_iterator(self):
+    def tiles_iterator(self):
         for tile in self._tiles:
             yield tile
+
+    def blocks_iterator(self):
+        """
+        Lists everything that may prevent a player to walk on
+        :return: iterator on everything that may block the player to move further
+        """
+        for wall in self._walls:
+            yield wall
 
     def __map(self):
         """
