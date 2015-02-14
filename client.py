@@ -20,16 +20,13 @@ class Client():
         print(self.socket.recv(1024))  # print welcome message
         #self.socket.setblocking(0)  # Asynchronous BlockingIOError: [Errno 11] Resource temporarily unavailable
 
-    def _format_msg(self, msg):
-        return bytes(msg, "ascii")
-
     def send_credentials(self):
         """
         Send credentials as plain text
         :return:
         """
         assert not self.is_connected, "User must not be connected to the server"
-        credential = self._format_msg('CONNECTING ' + self.user + ' ' + self.password)
+        credential = format_msg('CONNECTING ' + self.user + ' ' + self.password)
         expect = self.user + ' has been successfully connected.'
         while not self.is_connected:
             try:
@@ -46,6 +43,11 @@ class Client():
         assert self.is_connected, "User must be connected to the server"
 
     def run(self):
+        """
+        Game loop.  The client is connected and interact with the server through network packet.
+
+        :return:
+        """
         assert self.is_connected, "User must be connected to the server"
         while self.is_connected:
             try:
@@ -56,6 +58,11 @@ class Client():
 
     def quit(self):
         self.socket.close()
+
+
+def format_msg(msg):
+    return bytes(msg, "ascii")
+
 
 def parser_args():
     parser = argparse.ArgumentParser(prog="maid", description="MaindenQuebec's client")

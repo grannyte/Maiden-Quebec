@@ -11,10 +11,14 @@ import sys
 from threading import *
 
 
+def _format_msg(msg):
+    return bytes(msg, 'ascii')
+
+
 def client_thread(conn):
     conn.send(b'Welcome to the server. Type something and hit enter\n')
     while True:
-        reply = b'.'
+        reply = b'.' # always send something, so the client knows the connection is up and running
         data = conn.recv(1024)
         if not data:
             continue
@@ -22,41 +26,40 @@ def client_thread(conn):
             break
         str_data = data.decode("ascii")
         if str_data.startswith('CONNECTING'):
-            _, user, passwd = str_data.split(' ')
+            _, user, password = str_data.split(' ')
             # look up the database
             reply = _format_msg(user + ' has been successfully connected.')
 
         conn.sendall(reply)
-
     conn.close()
 
-def _format_msg(msg):
-    return bytes(msg, 'ascii')
- 
 
-def main():
-    # Bind socket to local host and port
-    host = 'localhost'
-    port = 9090
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.bind((host, port))
-    except socket.error as msg:
-        print('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
-        sys.exit()
+class Server():
+    def __init__(self, host, port):
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._bind_server('localhost', 9090)
+        self._max_connections(3)
 
-    max_connections = 3
-    s.listen(max_connections)
+    def _bind_server(self, host, port):
+        try:
+            self.server.bind((host, port))
+        except socket.error as msg:
+            print('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+            sys.exit()
 
-    is_running = True
-    while is_running:
-        conn, address = s.accept()
-        print('Connected with ' + address[0] + ':' + str(address[1]))
+    def _max_connections(self, max_connections):
+        self.server.listen(max_connections)
 
-        t = Thread(target=client_thread, args=(conn,))
-        t.start()
+    def run(self): 
+        while True:
+            conn, address = self.server.accept()
+            ip, port = address[0], address[1]
+            print('Connected with ' + ip + ':' + str(port))
+            t = Thread(target=client_thread, args=(conn,))
+            t.start()
+        self.server.close()
 
-    s.close()
 
 if __name__ == "__main__":
-    main()
+    server = Server('localhost', 9090)
+    server.run()
