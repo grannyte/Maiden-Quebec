@@ -2,6 +2,4 @@
 .idea/
 #Python compile a program to bytecode first and stores it in the __pycache__.
 **/__pycache__
-src/main.py
 data/level00.map
-src/main.py

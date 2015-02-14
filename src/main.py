@@ -7,11 +7,13 @@ from tile import Tile
 from exitblock import ExitBlock
 from camera import ComplexCamera
 from map import create_level
+from map import LSystemMap
+from map import Gene
 from spike import Spike
 from walls import Walls
 
-WIN_WIDTH = 800
-WIN_HEIGHT = 640
+WIN_WIDTH = 1920
+WIN_HEIGHT = 1080
 HALF_WIDTH = int(WIN_WIDTH / 2)
 HALF_HEIGHT = int(WIN_HEIGHT / 2)
 
@@ -41,14 +43,14 @@ class Game():
     def _init_spritesheet(self):
         """Initialize spritesheet"""
         spritesheets = ["fantasy-tileset.png"]
-        ss_path = os.path.join('', *[self._project_dir, 'data', spritesheets[0]])
+        ss_path = os.path.join('', *[self._project_dir, '../data', spritesheets[0]])
         self._spritesheet = spritesheet.Spritesheet(ss_path)
 
     def _init_game_variable(self):
         self.timer = pygame.time.Clock()
         self.map = pygame.sprite.Group()
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32, self._spritesheet)
+        self.player = Player(25*32, 25*32, self._spritesheet)
         self.platforms = []
 
     def _init_pygame(self):
@@ -62,7 +64,17 @@ class Game():
 
     def _load_level(self):
         x = y = 0
-        self.level = create_level()
+        local_map = LSystemMap(3, "{ATA>{ATATES}}<A")
+
+        local_map.append_gene(Gene("T", "TTT"))
+        local_map.append_gene(Gene("A", ">{AT<}"))
+        local_map.append_gene(Gene("TT", "[TA]T"))
+        local_map.append_gene(Gene("AT", "(AT)"))
+        local_map.append_gene(Gene("TA", "{TAS}"))
+        local_map.append_gene(Gene("S", "{<TAS}"))
+        local_map.append_gene(Gene("E", "{<TES}"))
+        self.level = local_map.buildmap(50, 50)
+            #create_level()
         # build the level
         for row in self.level:
             for col in row:
