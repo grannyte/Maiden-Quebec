@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import sys
+
 import argparse
 import re
 import socket
@@ -12,56 +14,46 @@ import socket
 """
 
 class Client():
+    """
+    Singleton that represents the client connections
+    """
     def __init__(self, args):
-        self.user, self.password, self.host, self.port = args
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
         self.is_connected = False
-        print(self.socket.recv(1024))  # print welcome message
-        #self.socket.setblocking(0)  # Asynchronous BlockingIOError: [Errno 11] Resource temporarily unavailable
+        self.user, self.password, self.host, self.port = args
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+        self._send_credentials()
+        self._remove_password()
 
-    def send_credentials(self):
+    def _send_credentials(self):
         """
-        Send credentials as plain text
+        Send credentials as plain text, synchronous transmission
         :return:
         """
         assert not self.is_connected, "User must not be connected to the server"
-        credential = format_msg('CONNECTING ' + self.user + ' ' + self.password)
+        credentials = bytes("CONNECTING {} {}".format(self.user, self.password), 'ascii')
         expect = self.user + ' has been successfully connected.'
-        while not self.is_connected:
-            try:
-                self.socket.send(credential)
-                data = self.socket.recv(512).decode("ascii")
-                if data == expect:
-                    self.is_connected = True
-            except socket.timeout:
-                """no data yet"""
-        print(expect)
-        # Get rid of password as it won't be use anymore
-        self.password = None
-        del self.password
-        assert self.is_connected, "User must be connected to the server"
+        try:
+            self.sock.sendall(credentials)
+            response = str(self.sock.recv(1024), 'ascii')
+            if response == expect:
+                print(response)
+                self.is_connected = True
+        except Exception:
+            print("An error occured while sending credentials", file=sys.stderr)
+            raise
+        assert self.is_connected, "User must not be connected to the server"
 
-    def run(self):
+    def _remove_password(self):
         """
-        Game loop.  The client is connected and interact with the server through network packet.
-
+        Delete the password for security purpose.  Currently, there is no security whatsoever
         :return:
         """
-        assert self.is_connected, "User must be connected to the server"
-        while self.is_connected:
-            try:
-                # send up user input and receive back server' permission, event and updates
-                data = socket.recv(512)
-            except socket.error:
-                '''no data yet..'''
+        self.password = None
+        del self.password
 
     def quit(self):
-        self.socket.close()
-
-
-def format_msg(msg):
-    return bytes(msg, "ascii")
+        self.sock.close()
 
 
 def parser_args():
@@ -80,5 +72,4 @@ def parser_args():
 if __name__ == '__main__':
     args = parser_args()
     client = Client(args)
-    client.send_credentials()
     client.quit()

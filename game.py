@@ -11,7 +11,8 @@ from src.map.temple import Temple
 
 from os.path import realpath, dirname
 
-class Client():
+
+class Game():
     def __init__(self, project_directory):
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
@@ -79,5 +80,5 @@ def _init_project_directory():
 
 if __name__ == '__main__':
     project_directory = _init_project_directory()
-    client = Client(project_directory)
-    client.run()
+    game = Game(project_directory)
+    game.run()
