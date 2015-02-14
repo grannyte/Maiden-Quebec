@@ -1,23 +1,4 @@
-from map import Map
 from abstract_astar import Action as AA_Action, Goal as AA_Goal, Heuristic as AA_Heuristic, State as AA_State, World as AA_World, AStar
-
-def main():
-    map = Map('test10.map')
-    map.print_as_grid()
-    world = World(map.grid)
-    initial_state = State(Cell(1,1,True))
-    goal = Goal(Cell(13,39,True))
-    heuristic = Heuristic()
-    astar = AStar(world, initial_state, goal, heuristic)
-
-    final_state = astar.final_state
-    if(final_state != None):
-        print("found")
-        while(final_state != None):
-            print("Cell: " + str(final_state.cell.x) + "," + str(final_state.cell.y))
-            final_state = final_state.parent
-    else:
-        print("not found")
 
 class Cell(object):
     def __init__(self, x, y, reachable):
@@ -106,5 +87,3 @@ class World(AA_World):
     def get_cell(self, x, y):
         return self.cells[x * self.grid_height + y]
 
-if __name__ == "__main__":
-    main()
