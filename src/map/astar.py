@@ -1,5 +1,5 @@
 from map import Map
-import heapq
+from abstract_astar import Action as AA_Action, Goal as AA_Goal, Heuristic as AA_Heuristic, State as AA_State, World as AA_World, AStar
 
 def main():
     map = Map('test10.map')
@@ -28,26 +28,26 @@ class Cell(object):
     def __eq__(self, othercell):
         return self.x == othercell.x and self.y == othercell.y
 
-class Action(object):
+class Action(AA_Action):
     def __init__(self, cost, cell):
         self.cost = cost
         self.cell = cell
 
-class Goal(object):
+class Goal(AA_Goal):
     def __init__(self, cell):
         self.cell = cell
 
     def is_reached(self, state):
         return self.cell == state.cell
 
-class Heuristic(object):
+class Heuristic(AA_Heuristic):
     def __init__(self):
         pass
 
     def estimate_cost_to_goal(self, state, goal):
         return 10 * (abs(goal.cell.x - state.cell.x) + abs(goal.cell.y - state.cell.y))
 
-class State(object):
+class State(AA_State):
     def __init__(self, cell):
         self.cell = cell
         self.parent = None
@@ -65,7 +65,7 @@ class State(object):
     def __lt__(self, otherstate):
         return self.f < otherstate.f
 
-class World(object):
+class World(AA_World):
     def __init__(self, grid):
         self.cells = []
         self.grid_def = {'start':'H', 'end':'E', 'wall':'#'}
@@ -105,45 +105,6 @@ class World(object):
 
     def get_cell(self, x, y):
         return self.cells[x * self.grid_height + y]
-
-
-class AStar(object):
-    def __init__(self, world, initialState, goal, heuristic):
-        self.opened = []
-        self.closed = []
-        self.final_state = None
-
-        # add the first state to the heap
-        heapq.heapify(self.opened)
-        heapq.heappush(self.opened, (initialState.f, initialState))
-
-        while len(self.opened):
-            # pop state from heap queue
-            f, actual_state = heapq.heappop(self.opened)
-            print("POP: " + str(actual_state.f) + " " + str(actual_state.cell.x) + " " + str(actual_state.cell.y))
-            # add state to closed list
-            self.closed.append(actual_state)
-
-            # if goal is reached, stop
-            if goal.is_reached(actual_state):
-                self.final_state = actual_state
-                break
-
-            # get possible actions from current state
-            possible_actions = world.getActions(actual_state)
-
-            for action in possible_actions:
-                next_state = world.execute(actual_state, action)
-                next_state.action_since_parent = action
-                next_state.g = actual_state.g + action.cost
-                next_state.h = heuristic.estimate_cost_to_goal(next_state, goal)
-                next_state.f = next_state.g + next_state.h
-                next_state.parent = actual_state
-
-                if(next_state not in self.closed):
-                    if((next_state.f, next_state) not in self.opened):
-                        heapq.heappush(self.opened, (next_state.f, next_state))
-
 
 if __name__ == "__main__":
     main()
