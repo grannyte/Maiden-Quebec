@@ -11,18 +11,21 @@ class Database():
         self.conn = sqlite3.connect('data/maiden-quebec.db')
         self.c = self.conn.cursor()
 
-    def query_connected(self, user):
-        query = (user,)
-        self.c.execute('SELECT * FROM connections WHERE user=?', query)
-        print(self.c.fetchone())
-        print(self.c.fetchone())
-        return self.c.fetchone() is not None
+    def __del__(self):
+        self.conn.close()
 
-    def add_connected(self, user):
-        query = (user,)
-        self.c.execute('INSERT INTO connections VALUES (?)', query)
+    def query_is_connected(self, user):
+        self.c.execute('SELECT * FROM connections WHERE user=? and date_out=?', (user, None))
+        return self.c.fetchone() is None
 
-    def remove_connected(self, user):
-        query = (user,)
-        self.c.execute('DELETE FROM connections WHERE user=(?)', query)
-        pass
+    def login(self, user, date_in):
+        self.c.execute('INSERT INTO connections VALUES (?,?,?)', (user, date_in, None))
+        self.conn.commit()
+
+    def logout(self, user, date_out):
+        self.c.execute('UPDATE connections SET date_out=? WHERE user=? and date_out=?', (user, date_out))
+        self.conn.commit()
+
+    def query_entities_in(self, zone):
+        query = (zone,)
+        self.c.execute('SELECT * FROM players WHERE zone=?', (query,))

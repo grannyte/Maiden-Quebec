@@ -30,7 +30,7 @@ class Client():
         :return:
         """
         assert not self.is_connected, "User must not be connected to the server"
-        credentials = bytes("CONNECTING {} {}".format(self.user, self.password), 'ascii')
+        credentials = bytes("LOGIN {} {}".format(self.user, self.password), 'ascii')
         expect = self.user + ' has been successfully connected.'
         try:
             self.sock.sendall(credentials)
@@ -39,7 +39,8 @@ class Client():
             if response == expect:
                 self.is_connected = True
             else:
-                raise Exception("Cannot connect to server")
+                raise Exception("""Cannot connect to server.
+                Server may be down or you did not provides correct credentials""")
         except Exception:
             print("An error occurred while sending credentials", file=sys.stderr)
             raise
@@ -55,7 +56,7 @@ class Client():
 
     def request_entities(self, zone):
         """
-        Ask the server for all entities in the map
+        Ask the server for all entities in the map.
         :return:
         """
         assert zone is not None
