@@ -2,9 +2,6 @@
 from __future__ import print_function
 
 import sys
-
-import argparse
-import re
 import socket
 
 """
@@ -39,10 +36,12 @@ class Client():
             if response == expect:
                 print(response)
                 self.is_connected = True
+            else:
+                raise Exception("Cannot connect to server")
         except Exception:
-            print("An error occured while sending credentials", file=sys.stderr)
+            print("An error occurred while sending credentials", file=sys.stderr)
             raise
-        assert self.is_connected, "User must not be connected to the server"
+        assert self.is_connected, "User must be connected to the server"
 
     def _remove_password(self):
         """
@@ -52,24 +51,22 @@ class Client():
         self.password = None
         del self.password
 
+    def request_entities(self, zone):
+        """
+        Ask the server for all entities in the map
+        :return:
+        """
+        assert zone is not None
+        request = bytes("ENTITIES {}".format(zone), 'ascii')
+        try:
+            self.sock.sendall(request)
+            response = str(self.sock.recv(1024), 'ascii')
+        except Exception:
+            print("An error occurred while asking for zone entities", file=sys.stderr)
+            raise
+
+
+
+
     def quit(self):
         self.sock.close()
-
-
-def parser_args():
-    parser = argparse.ArgumentParser(prog="maid", description="MaindenQuebec's client")
-    parser.add_argument('--user', type=str, required=True, help="Player's user name")
-    parser.add_argument('--password', type=str, required=True, help="Player's password")
-    parser.add_argument('--host', type=str, required=True, help="Server's hostname")
-    parser.add_argument('--port', type=int, required=True, help="Server's listening port")
-    args =  parser.parse_args()
-    # TODO: Add others regex
-    if len(re.match(r'\w{1,16}', args.user).group(0)) != len(args.user):
-        raise Exception("User name must have between 1 and 16 (inclusive) character from A to Z, a to z, 0 to 9 and _")
-    return args.user, args.password, args.host, args.port
-
-
-if __name__ == '__main__':
-    args = parser_args()
-    client = Client(args)
-    client.quit()

@@ -14,12 +14,15 @@ import socketserver
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        request = str(self.request.recv(1024), 'ascii')
+        request = str(self.request.recv(1024), 'ascii').strip()
         response = b'.'
         if request.startswith('CONNECTING'):
             _, user, password = request.split(' ')
             # TODO: update the database
             response = bytes("{} {}".format(user, 'has been successfully connected.'), 'ascii')
+        if request.startswith('ENTITIES'):
+            # TODO: query the database
+            _, zone = request.split(' ')
         self.request.sendall(response)
 
 

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+from os.path import realpath, dirname
+import argparse
+import re
+
 import pygame
 from pygame import *
 
@@ -9,8 +13,6 @@ from src.hud.hud_health import HudHealth
 from src.sprite.hero import Hero
 from src.map.temple import Temple
 from client import Client
-
-from os.path import realpath, dirname
 
 
 class Game():
@@ -24,8 +26,9 @@ class Game():
         self.timer = time.Clock()
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
-        self.camera = ComplexCamera(1024, 768, 800, 600)
+        self.camera = ComplexCamera(2048, 2048, 800, 600)
         self._hud_health = HudHealth()
+
 
         # TODO: Client should get updates from server
         self.player = Hero(8, 8, 64, project_directory)
@@ -79,6 +82,17 @@ class Game():
 
         pygame.display.update()
 
+def parser_args():
+    parser = argparse.ArgumentParser(prog="maid", description="MaindenQuebec's client")
+    parser.add_argument('--user', type=str, required=True, help="Player's user name")
+    parser.add_argument('--password', type=str, required=True, help="Player's password")
+    parser.add_argument('--host', type=str, required=True, help="Server's hostname")
+    parser.add_argument('--port', type=int, required=True, help="Server's listening port")
+    args =  parser.parse_args()
+    # TODO: Add others regex
+    if len(re.match(r'\w{1,16}', args.user).group(0)) != len(args.user):
+        raise Exception("User name must have between 1 and 16 (inclusive) character from A to Z, a to z, 0 to 9 and _")
+    return args.user, args.password, args.host, args.port
 
 def _init_project_directory():
         """
@@ -90,5 +104,8 @@ def _init_project_directory():
 
 if __name__ == '__main__':
     project_directory = _init_project_directory()
+    args = parser_args()
+    client = Client(args)
     game = Game(project_directory)
     game.run()
+    client.quit()
