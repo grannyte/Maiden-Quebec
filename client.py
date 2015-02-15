@@ -10,6 +10,8 @@ import socket
     is a prototype, you are urged to not push it to his limit; keep the number of connections low.
 """
 
+# TEST: --user pl, --pass lp --host localhost --port 9090
+
 class Client():
     """
     Singleton that represents the client connections
@@ -33,8 +35,8 @@ class Client():
         try:
             self.sock.sendall(credentials)
             response = str(self.sock.recv(1024), 'ascii')
+            print(response)
             if response == expect:
-                print(response)
                 self.is_connected = True
             else:
                 raise Exception("Cannot connect to server")

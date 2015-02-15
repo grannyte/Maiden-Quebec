@@ -10,16 +10,24 @@ import socket
 import threading
 import socketserver
 
+from database_builder import DatabaseBuilder
+from database import Database
+
 
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+
+    def __init__(self, request, client_address, server):
+        self.db = Database()
+        socketserver.BaseRequestHandler.__init__(self, request, client_address, server)
 
     def handle(self):
         request = str(self.request.recv(1024), 'ascii').strip()
         response = b'.'
         if request.startswith('CONNECTING'):
             _, user, password = request.split(' ')
-            # TODO: update the database
-            response = bytes("{} {}".format(user, 'has been successfully connected.'), 'ascii')
+            if not self.db.query_connected(user):
+                self.db.add_connected(user)
+                response = bytes("{} {}".format(user, 'has been successfully connected.'), 'ascii')
         if request.startswith('ENTITIES'):
             # TODO: query the database
             _, zone = request.split(' ')
@@ -31,6 +39,8 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 
 if __name__ == "__main__":
+    # Set up the database beforehand
+    dbb = DatabaseBuilder()
     # Port 0 means to select an arbitrary unused port
     HOST, PORT = "localhost", 9090
     server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)

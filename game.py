@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from os.path import realpath, dirname
+# TODO: --user pl --password lp --host localhost --port 9090
+
 import argparse
 import re
 
 import pygame
 from pygame import *
-
 from src.camera import ComplexCamera
 from src.hud.hud_health import HudHealth
 from src.sprite.hero import Hero
 from src.map.temple import Temple
 from client import Client
+from config import init_project_directory
 
 
+#  TODO: ???Singleton or convention??? remove the class and put everything at module level
 class Game():
     """
-    Run the game with local resource and get extra from server (players, monsters, drops, quests)
+    Run the game with local resource and get extras from server (players, monsters, drops, quests)
     """
-    def __init__(self, project_directory):
+    def __init__(self):
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
-        self.project_directory = project_directory
+        self.project_directory = init_project_directory()
         self.timer = time.Clock()
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
@@ -31,11 +33,11 @@ class Game():
 
 
         # TODO: Client should get updates from server
-        self.player = Hero(8, 8, 64, project_directory)
+        self.player = Hero(8, 8, 64, self.project_directory)  # TODO: remove project directoy from signature
         self.entities = sprite.Group()
         self.entities.add(self.player)
 
-        self.location = Temple(project_directory)
+        self.location = Temple(self.project_directory)  # TODO: remove project directoy from signature
         self.sprites = sprite.Group()
         for tile in self.location.tiles_iterator():
             self.sprites.add(tile)
@@ -94,18 +96,12 @@ def parser_args():
         raise Exception("User name must have between 1 and 16 (inclusive) character from A to Z, a to z, 0 to 9 and _")
     return args.user, args.password, args.host, args.port
 
-def _init_project_directory():
-        """
-        Initializes project's root directory
-        """
-        full_path = realpath(__file__)
-        return dirname(full_path)
-
 
 if __name__ == '__main__':
-    project_directory = _init_project_directory()
     args = parser_args()
     client = Client(args)
-    game = Game(project_directory)
+    game = Game()
     game.run()
     client.quit()
+
+__author__ = "plperron, jmjodoin, ddelisle"
