@@ -4,18 +4,14 @@ from __future__ import print_function
 import sys
 import socket
 
-"""
-    Game client using threads to manage connections.  Server is using the TCP protocol and
-    might not suit game over Internet.  It is best to host local network games.  As this game
-    is a prototype, you are urged to not push it to his limit; keep the number of connections low.
-"""
+try:
+    import pickle
+except ImportError:
+    import cPickle as pickle
 
 # TEST: --user pl, --pass lp --host localhost --port 9090
 
 class Client():
-    """
-    Singleton that represents the client connections
-    """
     def __init__(self, args):
         self.is_connected = False
         self.user, self.password, self.host, self.port = args
@@ -27,23 +23,21 @@ class Client():
     def _send_credentials(self):
         """
         Send credentials as plain text, synchronous transmission
-        :return:
+        :return: {'answer': 'OK', 'msg': msg}
         """
-        assert not self.is_connected, "User must not be connected to the server"
-        credentials = bytes("LOGIN {} {}".format(self.user, self.password), 'ascii')
-        expect = self.user + ' has been successfully connected.'
+        assert not self.is_connected, "User must not be already connected to the server"
         try:
+            credentials = bytes("LOGIN {} {}".format(self.user, self.password), 'ascii')
             self.sock.sendall(credentials)
-            response = str(self.sock.recv(1024), 'ascii')
+            response = self.sock.recv(1024)
             print(response)
-            if response == expect:
-                self.is_connected = True
-            else:
-                raise Exception("""Cannot connect to server.
-                Server may be down or you did not provides correct credentials""")
-        except Exception:
-            print("An error occurred while sending credentials", file=sys.stderr)
+            response = pickle.loads(response)
+            print(response)
+            if response['answer'] != 'OK':
+                raise Exception('An error occurred while sending credentials')
+        except:
             raise
+        self.is_connected = True
         assert self.is_connected, "User must be connected to the server"
 
     def _remove_password(self):
@@ -54,22 +48,21 @@ class Client():
         self.password = None
         del self.password
 
-    def request_entities(self, zone):
+    def where_am_I(self, user):
         """
-        Ask the server for all entities in the map.
-        :return:
+        Determine in which zone the user is.  Response from server is Picklified
+        :param user: The user which the zone is required
+        :return: {'answer': 'OK', 'user': user, 'zone': zone}
         """
-        assert zone is not None
-        request = bytes("ENTITIES {}".format(zone), 'ascii')
         try:
+            request = bytes("WHERE {}".format(user), 'ascii')
             self.sock.sendall(request)
-            response = str(self.sock.recv(1024), 'ascii')
-        except Exception:
-            print("An error occurred while asking for zone entities", file=sys.stderr)
+            response = self.sock.recv(1024)
+            if response['answer'] != 'OK':
+                raise Exception('An error occurred while asking user zone')
+            return response.zone
+        except:
             raise
-
-
-
 
     def quit(self):
         self.sock.close()

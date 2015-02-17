@@ -13,10 +13,6 @@ class Database():
     def __del__(self):
         self.conn.close()
 
-    def is_user_connected(self, user):
-        self.c.execute('SELECT * FROM connections WHERE user=? and date_out=?', (user, None))
-        return self.c.fetchone() is None
-
     def login(self, user, date_in):
         self.c.execute('INSERT INTO connections VALUES (?,?,?)', (user, date_in, None))
         self.conn.commit()
@@ -25,14 +21,6 @@ class Database():
         self.c.execute('UPDATE connections SET date_out=? WHERE user=? and date_out=?', (user, date_out))
         self.conn.commit()
 
-    def does_zone_exist(self, zone):
-        self.c.execute('SELECT * FROM connections WHERE zone=?', (zone,))
-        return self.c.fetchone() is not None
-
-    def fetch_zone(self, zone):
-        self.c.execute('SELECT * FROM connections WHERE zone=?', (zone,))
-
-
-    def query_entities_in(self, zone):
-        query = (zone,)
-        self.c.execute('SELECT * FROM players WHERE zone=?', (query,))
+    def where_am_I(self, user):
+        self.c.execute('SELECT zone FROM players WHERE user=?', (user,))
+        return self.c.fetchone()

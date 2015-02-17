@@ -7,6 +7,7 @@ from __future__ import print_function
     is a prototype, you are urged to not push it to his limit; keep the number of connections low.
 """
 
+import sys
 import threading
 import socketserver
 import datetime
@@ -34,48 +35,45 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         :return:
         """
         request = str(self.request.recv(1024), 'ascii').strip()
-        if request.startswith('LOGIN'):
-            response = self.request_login(request)
-        elif request.startswith('LOGOUT'):
-            response = self.request_logout(request)
-        elif request.startswith('ZONE'):
-            _, zone = request.split(' ')
-        elif request.startswith('ENTITIES'):
-            pass
-        else:
-            response = self.request_anything_else(request)
-        self.request.sendall(pickle.dump(response))
+        try:
+            if request.startswith('LOGIN'):
+                response = self.request_login(request)
+            elif request.startswith('LOGOUT'):
+                response = self.request_logout(request)
+            elif request.startswith('WHERE'):
+                response = self.request_logout(request)
+            else:
+                response = self.request_anything_else(request)
+        except Exception as e:
+            print_function(e, file=sys.stderr)
+            raise
+        piclify = pickle.dumps(response)
+        print(response)
+        print(piclify)
+        self.request.sendall(piclify)
 
-    #TODO: replace if else with try catch instead
     def request_login(self, request):
         _, user, password = request.split(' ')
-        if self.db.is_user_connected(user):
-            return bytes("{} {}".format(user, 'is already connected.'), 'ascii')
-        else:
-            date_in = datetime.datetime.now(datetime.timezone.utc).timestamp()
-            self.db.login(user, date_in)
-            return bytes("{} {}".format(user, 'has been successfully connected.'), 'ascii')
+        date_in = datetime.datetime.now(datetime.timezone.utc).timestamp()
+        self.db.login(user, date_in)
+        msg = '{} {}'.format(user, 'has been successfully connected.', 'ascii')
+        return {'answer': 'OK', 'msg': msg}
 
     def request_logout(self, request):
         _, user = request.split(' ')
-        if self.db.is_user_connected(user):
-            date_out = datetime.datetime.now(datetime.timezone.utc).timestamp()
-            self.db.logout(user, date_out)
-            return bytes("{} {}".format(user, 'has been successfully disconnected.'), 'ascii')
-        else:
-            return bytes("{}".format('Are you messing with the server ?'), 'ascii')
+        date_out = datetime.datetime.now(datetime.timezone.utc).timestamp()
+        self.db.logout(user, date_out)
+        msg = '{} {}'.format(user, 'has been successfully disconnected.', 'ascii')
+        return {'answer': 'OK', 'msg': msg}
 
-    def request_zone(self, request):
-        _, zone = request.split(' ')
-        if self.db.does_zone_exist(zone):
-            pass
-        else:
-            # TODO: generate map via L-System and send it back.  The player is sending false packets
-            pass
+    def where_am_I(self, request):
+        _, user = request.split(' ')
+        zone = self.db.where_am_I(user)
+        return {'answer': 'OK', 'user': user, 'zone': zone}
 
     def request_anything_else(self, request):
-        print('Someone made an unusual request')
-        return {".": None}
+        raise NotImplementedError('Someone made an unusual request')
+
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass

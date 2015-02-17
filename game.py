@@ -21,29 +21,24 @@ class Game():
     """
     Run the game with local resource and get extras from server (players, monsters, drops, quests)
     """
-    def __init__(self):
+    def __init__(self, client, user):
+        self.client = client
+        self.user = user # TODO: Differentiate user from player name
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
         self.project_directory = init_project_directory()
         self.timer = time.Clock()
+        # TODO: New/Load Game HUD
+
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
         self.camera = ComplexCamera(2048, 2048, 800, 600)
         self._hud_health = HudHealth()
 
-
-        # TODO: Client should get updates from server
-        self.player = Hero(8, 8, 64, self.project_directory)  # TODO: remove project directoy from signature
+        # Those are updated by the server
         self.entities = sprite.Group()
-        self.entities.add(self.player)
-
-        self.location = Temple(self.project_directory)  # TODO: remove project directoy from signature
         self.sprites = sprite.Group()
-        for tile in self.location.tiles_iterator():
-            self.sprites.add(tile)
         self.blocks = sprite.Group()
-        for block in self.location.blocks_iterator():
-            self.blocks.add(block)
 
 
     def run(self):
@@ -67,6 +62,17 @@ class Game():
             self._draw()
 
     def _update(self):
+        # TODO s:
+        # Does the player know where he is ?
+
+
+        # Does he know what the others are
+
+        # Does he know what he looks like
+
+        # Does he know what the others look like
+
+
         self.entities.update(self.blocks)
         self.sprites.update()
         self.camera.update(self.player)
@@ -99,9 +105,9 @@ def parser_args():
 
 if __name__ == '__main__':
     args = parser_args()
-    #client = Client(args)
-    game = Game()
+    user, _, _, _ = args
+    client = Client(args)
+    game = Game(client, user)
     game.run()
-    #client.quit()
 
 __author__ = "plperron, jmjodoin, ddelisle"
