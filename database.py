@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import sqlite3
+import sqlite3 as lite
 
 class Database():
     """
-
     """
     def __init__(self):
-        self.conn = sqlite3.connect('data/maiden-quebec.db')
+        self.conn = lite.connect('data/maiden-quebec.db')
         self.c = self.conn.cursor()
 
     def __del__(self):
         self.conn.close()
 
-    def query_is_connected(self, user):
+    def is_user_connected(self, user):
         self.c.execute('SELECT * FROM connections WHERE user=? and date_out=?', (user, None))
         return self.c.fetchone() is None
 
@@ -25,6 +24,14 @@ class Database():
     def logout(self, user, date_out):
         self.c.execute('UPDATE connections SET date_out=? WHERE user=? and date_out=?', (user, date_out))
         self.conn.commit()
+
+    def does_zone_exist(self, zone):
+        self.c.execute('SELECT * FROM connections WHERE zone=?', (zone,))
+        return self.c.fetchone() is not None
+
+    def fetch_zone(self, zone):
+        self.c.execute('SELECT * FROM connections WHERE zone=?', (zone,))
+
 
     def query_entities_in(self, zone):
         query = (zone,)

@@ -99,9 +99,9 @@ def parser_args():
 
 if __name__ == '__main__':
     args = parser_args()
-    client = Client(args)
+    #client = Client(args)
     game = Game()
     game.run()
-    client.quit()
+    #client.quit()
 
 __author__ = "plperron, jmjodoin, ddelisle"
