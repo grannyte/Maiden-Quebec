@@ -15,6 +15,7 @@ from src.sprite.wall import Wall
 from src.sprite.floor import Floor
 from src.sprite.door import Door
 from src.hud.hud_health import HudHealth
+from src.sprite.quad_tree import QuadTree
 
 from config import init_project_directory
 
@@ -40,17 +41,17 @@ class Game():
         hero_info['skin'] = 'male'
         hero_info['level'] = 1
         hero_info['cur_hp'] = 80
-        hero_info['max_hp'] = 10
+        hero_info['max_hp'] = 100
         hero_info['strength'] = 20
         hero_info['zone'] = 'Temple'
         hero_info['coord_x'] = 3 * 64
         hero_info['coord_y'] = 1 * 64
         hero_info['tile_size'] = 64
         hero_info['rect'] = pygame.Rect(3 * 64, 1 * 64, 64, 64)
-        self.player = Hero(hero_info)
+        self.hero = Hero(hero_info)
 
         topology = build_temple()
-        # Those are updated by the server
+        #
         self.blocks = sprite.Group()
         for wall in topology['walls']:
             self.blocks.add(Wall(topology['wall_sprite'], wall))
@@ -59,7 +60,9 @@ class Game():
         for door in topology['doors']:
             self.blocks.add(Door(topology['door_sprite'], door))
         self.sprites = sprite.Group()
-        self.sprites.add(self.player)
+        self.sprites.add(self.hero)
+
+
 
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
@@ -67,8 +70,12 @@ class Game():
         self._hud_health = HudHealth()
 
 
+        #Collisions
+        walls = [Wall(topology['wall_sprite'], wall) for wall in topology['walls']]
+        self.quad_walls = QuadTree(walls)
+
     def run(self):
-        fps = 60
+        fps = 180
         is_running = True
 
         while is_running:
@@ -81,7 +88,7 @@ class Game():
 
             if pygame.key.get_focused():
                 pressed = pygame.key.get_pressed()
-                self.player.control(pressed)
+                self.hero.control(pressed, self.quad_walls)
 
             # TODO: AI
             self._update()
@@ -89,7 +96,7 @@ class Game():
 
     def _update(self):
         self.sprites.update()
-        self.camera.update(self.player)
+        self.camera.update(self.hero)
 
     def _draw(self):
         for b in self.blocks:
@@ -98,7 +105,7 @@ class Game():
             self.screen.blit(s.image, self.camera.apply(s))
 
 
-        hh = self._hud_health.update(8, 32)
+        hh = self._hud_health.update(self.hero.hero_infos['cur_hp'], self.hero.hero_infos['max_hp'])
         self.screen.blit(hh['label'], hh['at'])
         pygame.draw.rect(self.screen, hh['color'], hh['hp'])
 

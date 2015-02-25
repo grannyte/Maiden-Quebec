@@ -13,6 +13,6 @@ class HudHealth(StatusHud):
         self._rect_width = 128 - 32
 
     def update(self, current_hp, max_hp):
-        pourcent_hp = self._rect_width * current_hp / max_hp
+        pourcent_hp = self._rect_width * (current_hp / max_hp)
         rect = (self._rect[0], self._rect[1], pourcent_hp, self._rect[3])
         return {'label': self._label, 'at': (2, 4), 'hp': rect, 'color': self._color}
