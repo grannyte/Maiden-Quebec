@@ -6,6 +6,7 @@ import pygame
 from os.path import join
 from config import img
 from src.sprite.spritesheet import Spritesheet
+import random
 
 class Monster(pygame.sprite.Sprite):
 
@@ -26,30 +27,43 @@ class Monster(pygame.sprite.Sprite):
         self.image = sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0))
         # Control
         self.isStandingStill = True
-        self.direction = 'left'
+        self.direction = 'up'
         self.direction_count = 0
+        self.random = random.randrange(1,5)*64
 
-    def update(self):
-        if(self.direction == 'left'):
+    def update(self, quad):
+        if(self.direction == 'up'):
             self.rect.top -= 1
-            if(self.direction_count == 64):
-                self.direction_count = 0
-                self.direction = 'up'
-        elif(self.direction == 'up'):
-            self.rect.left += 1
-            if(self.direction_count == 64):
-                self.direction_count = 0
-                self.direction = 'right'
-        elif(self.direction == 'right'):
-            self.rect.top += 1
-            if(self.direction_count == 64):
-                self.direction_count = 0
-                self.direction = 'down'
-        else:
-            self.rect.left -= 1
-            if(self.direction_count == 64):
-                self.direction_count = 0
+            collision_rect = self.__collide_rect()
+            collisions = quad.which_collide_with(collision_rect)
+            if len(collisions) > 0 or self.direction_count > self.random*64:
+                self.random = random.randrange(1,5)
                 self.direction = 'left'
+                self.direction_count = 0
+        elif(self.direction == 'left'):
+            self.rect.left -= 1
+            collision_rect = self.__collide_rect()
+            collisions = quad.which_collide_with(collision_rect)
+            if len(collisions) > 0 or self.direction_count > self.random*64:
+                self.random = random.randrange(1,5)
+                self.direction = 'down'
+                self.direction_count = 0
+        elif(self.direction == 'down'):
+            self.rect.top += 1
+            collision_rect = self.__collide_rect()
+            collisions = quad.which_collide_with(collision_rect)
+            if len(collisions) > 0 or self.direction_count > self.random*64:
+                self.random = random.randrange(1,5)
+                self.direction = 'right'
+                self.direction_count = 0
+        else:
+            self.rect.left += 1
+            collision_rect = self.__collide_rect()
+            collisions = quad.which_collide_with(collision_rect)
+            if len(collisions) > 0 or self.direction_count > self.random*64:
+                self.random = random.randrange(1,5)
+                self.direction = 'up'
+                self.direction_count = 0
         self.direction_count += 1
 
 

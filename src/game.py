@@ -64,6 +64,7 @@ class Game():
             self.blocks.add(Door(topology['door_sprite'], door))
         self.sprites = sprite.Group()
         self.sprites.add(self.hero)
+        self.entities = sprite.Group()
 
         self.sprites_monster = sprite.Group()
         self.sprites_monster.add(self.monster)
@@ -92,17 +93,13 @@ class Game():
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
                     is_running = False
 
-            if pygame.key.get_focused():
-                pressed = pygame.key.get_pressed()
-                self.hero.control(pressed, self.quad_walls)
-
             # TODO: AI
             self._update()
             self._draw()
 
     def _update(self):
-        self.sprites.update()
         self.sprites_monster.update(self.quad_walls)
+        self.sprites.update(self.entities, self.quad_walls)
         self.camera.update(self.hero)
 
     def _draw(self):
