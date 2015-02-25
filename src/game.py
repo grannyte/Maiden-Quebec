@@ -10,9 +10,9 @@ import pygame
 from pygame import *
 from src.camera import ComplexCamera
 from src.hud.hud_health import HudHealth
-from src.sprite.hero import Hero
-from src.map.temple import Temple
-from client import Client
+
+from src.map import Map
+from src.network.client import Client
 from config import init_project_directory
 
 
@@ -23,27 +23,35 @@ class Game():
     """
     def __init__(self, client, user):
         self.client = client
-        self.user = user # TODO: Differentiate user from player name
+
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
         self.project_directory = init_project_directory()
         self.timer = time.Clock()
+        # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
+        self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
+
         # TODO: New/Load Game HUD
+
+
+
+        self.player = Hero(client.who_is(user))
+        self.dongeon = Map(client.where_is(user))
+        # Those are updated by the server
+        self.entities = sprite.Group()
+        self.sprites = sprite.Group()
+        self.blocks = sprite.Group()
 
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
         self.camera = ComplexCamera(2048, 2048, 800, 600)
         self._hud_health = HudHealth()
 
-        # Those are updated by the server
-        self.entities = sprite.Group()
-        self.sprites = sprite.Group()
-        self.blocks = sprite.Group()
-
 
     def run(self):
         fps = 60
         is_running = True
+
         while is_running:
             self.timer.tick(fps)
             for e in pygame.event.get():
@@ -58,11 +66,15 @@ class Game():
 
             # TODO: AI
 
+            self.client.where_is(self.user)
             self._update()
             self._draw()
 
     def _update(self):
         # TODO s:
+        # Do the player know who he is
+
+
         # Does the player know where he is ?
 
 

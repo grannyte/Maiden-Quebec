@@ -9,6 +9,7 @@ try:
 except ImportError:
     import cPickle as pickle
 
+#
 # TEST: --user pl, --pass lp --host localhost --port 9090
 
 class Client():
@@ -17,10 +18,10 @@ class Client():
         self.user, self.password, self.host, self.port = args
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.host, self.port))
-        self._send_credentials()
+        self._login()
         self._remove_password()
 
-    def _send_credentials(self):
+    def _login(self):
         """
         Send credentials as plain text, synchronous transmission
         :return: {'answer': 'OK', 'msg': msg}
@@ -32,7 +33,6 @@ class Client():
             response = self.sock.recv(1024)
             print(response)
             response = pickle.loads(response)
-            print(response)
             if response['answer'] != 'OK':
                 raise Exception('An error occurred while sending credentials')
         except:
@@ -48,9 +48,29 @@ class Client():
         self.password = None
         del self.password
 
-    def where_am_I(self, user):
+    def who_is(self, user):
         """
-        Determine in which zone the user is.  Response from server is Picklified
+        Looks what is the player made of
+        :param user: the player's name.
+            Here, user and player are the same even though a user might might/should have multiple players
+        :return:
+        """
+        try:
+            request = bytes("USER {}".format(self.user), 'ascii')
+            self.sock.sendall(request)
+            response = self.sock.recv(1024)
+            response = pickle.loads(response)
+            if response['answer'] != 'OK':
+                raise Exception('An error occurred while searching user in database')
+            response.pop('answer', None)
+            return response
+        except:
+            raise
+
+
+    def where_is(self, user):
+        """
+        Determine in which zone the user is.
         :param user: The user which the zone is required
         :return: {'answer': 'OK', 'user': user, 'zone': zone}
         """

@@ -3,6 +3,9 @@ from __future__ import print_function
 
 
 class Map(object):
+    def __init__(self, map_info):
+        pas
+
     def __init__(self):
         self._sprite_sheet = {}
         self._tile_size = 64
