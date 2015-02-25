@@ -23,5 +23,4 @@ class Hero(pygame.sprite.Sprite):
         self.image = sprite_sheet.image_at(pygame.Rect(0, 0, 64, 64))
 
     def control(self, key_pressed):
-        print("bob")
         pass

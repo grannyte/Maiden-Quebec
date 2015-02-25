@@ -12,7 +12,6 @@ from src.camera import ComplexCamera
 from src.sprite.hero import Hero
 from src.hud.hud_health import HudHealth
 
-from src.map import Map
 from config import init_project_directory
 
 
@@ -39,21 +38,16 @@ class Game():
         hero_info['cur_hp'] = 80
         hero_info['max_hp'] = 10
         hero_info['strength'] = 20
-        hero_info['endurance'] = 20
-        hero_info['dexterity'] = 20
-        hero_info['intelligence'] = 20
-        hero_info['wisdom'] = 20
         hero_info['zone'] = 'Temple'
-        hero_info['coord_x'] = 8
-        hero_info['coord_y'] = 8
+        hero_info['coord_x'] = 3 * 64
+        hero_info['coord_y'] = 1 * 64
         hero_info['tile_size'] = 64
-        hero_info['rect'] = pygame.Rect(8, 8, 64, 64)
-        hero_info['left_hand'] = None
-        hero_info['right_hand'] = None
-        hero_info['armor'] = None
+        hero_info['rect'] = pygame.Rect(3 * 64, 1 * 64, 64, 64)
         self.player = Hero(hero_info)
 
-        self.dongeon = Map()
+        map_info = dict()
+
+        #self.dongeon = Map(map_info)
         # Those are updated by the server
         self.entities = sprite.Group()
         self.sprites = sprite.Group()
