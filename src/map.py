@@ -4,7 +4,7 @@ from __future__ import print_function
 
 class Map(object):
     def __init__(self, map_info):
-        pas
+        pass
 
     def __init__(self):
         self._sprite_sheet = {}

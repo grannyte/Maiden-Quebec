@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from pygame import K_RIGHT, K_LEFT, K_UP, K_DOWN
+import pygame
 
-from os.path import join
+from src.sprite.spritesheet import Spritesheet
 
-from src.sprite.life_form import LifeForm
+class Hero(pygame.sprite.Sprite):
 
-
-class Hero(LifeForm):
     def __init__(self, player_infos):
         """
         :param player_infos: A dict with the following keys
@@ -18,10 +16,12 @@ class Hero(LifeForm):
             left_hand,right_hand,armor
         :return:
         """
-        self.playerinfos = player_infos
+        pygame.sprite.Sprite.__init__(self)
+        self.player_infos = player_infos
+        self.rect = player_infos['rect']
+        sprite_sheet = Spritesheet("/home/plperron/PycharmProjects/Maiden-Quebec/data/img/spritesheets/male.png")
+        self.image = sprite_sheet.image_at(pygame.Rect(0, 0, 64, 64))
+
+    def control(self, key_pressed):
+        print("bob")
         pass
-
-
-
-    def _change_appearance(self, spritesheet_path, tile_size):
-        LifeForm._change_appearance(self, spritesheet_path, tile_size)

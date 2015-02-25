@@ -9,10 +9,10 @@ import re
 import pygame
 from pygame import *
 from src.camera import ComplexCamera
+from src.sprite.hero import Hero
 from src.hud.hud_health import HudHealth
 
 from src.map import Map
-from src.network.client import Client
 from config import init_project_directory
 
 
@@ -21,9 +21,8 @@ class Game():
     """
     Run the game with local resource and get extras from server (players, monsters, drops, quests)
     """
-    def __init__(self, client, user):
-        self.client = client
-
+    def __init__(self, user, password):
+        self.user = user
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
         self.project_directory = init_project_directory()
@@ -32,15 +31,34 @@ class Game():
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
 
         # TODO: New/Load Game HUD
+        hero_info = dict()
+        hero_info['user'] = user
+        hero_info['password'] = password
+        hero_info['skin'] = 'male'
+        hero_info['level'] = 1
+        hero_info['cur_hp'] = 80
+        hero_info['max_hp'] = 10
+        hero_info['strength'] = 20
+        hero_info['endurance'] = 20
+        hero_info['dexterity'] = 20
+        hero_info['intelligence'] = 20
+        hero_info['wisdom'] = 20
+        hero_info['zone'] = 'Temple'
+        hero_info['coord_x'] = 8
+        hero_info['coord_y'] = 8
+        hero_info['tile_size'] = 64
+        hero_info['rect'] = pygame.Rect(8, 8, 64, 64)
+        hero_info['left_hand'] = None
+        hero_info['right_hand'] = None
+        hero_info['armor'] = None
+        self.player = Hero(hero_info)
 
-
-
-        self.player = Hero(client.who_is(user))
-        self.dongeon = Map(client.where_is(user))
+        self.dongeon = Map()
         # Those are updated by the server
         self.entities = sprite.Group()
         self.sprites = sprite.Group()
         self.blocks = sprite.Group()
+        self.sprites.add(self.player)
 
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
         self.screen = display.set_mode((800, 600), pygame.HWSURFACE)
@@ -65,26 +83,10 @@ class Game():
                 self.player.control(pressed)
 
             # TODO: AI
-
-            self.client.where_is(self.user)
             self._update()
             self._draw()
 
     def _update(self):
-        # TODO s:
-        # Do the player know who he is
-
-
-        # Does the player know where he is ?
-
-
-        # Does he know what the others are
-
-        # Does he know what he looks like
-
-        # Does he know what the others look like
-
-
         self.entities.update(self.blocks)
         self.sprites.update()
         self.camera.update(self.player)
@@ -117,9 +119,8 @@ def parser_args():
 
 if __name__ == '__main__':
     args = parser_args()
-    user, _, _, _ = args
-    client = Client(args)
-    game = Game(client, user)
+    user, password, _, _ = args
+    game = Game(user, password)
     game.run()
 
 __author__ = "plperron, jmjodoin, ddelisle"
