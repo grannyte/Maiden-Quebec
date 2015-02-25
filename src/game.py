@@ -9,6 +9,7 @@ import re
 import pygame
 from pygame import *
 from src.camera import ComplexCamera
+from src.sprite.monster import Monster
 from src.sprite.hero import Hero
 from src.sprite.topology import build_temple
 from src.sprite.wall import Wall
@@ -44,11 +45,13 @@ class Game():
         hero_info['max_hp'] = 100
         hero_info['strength'] = 20
         hero_info['zone'] = 'Temple'
-        hero_info['coord_x'] = 3 * 64
+        hero_info['coord_x'] = 8 * 64
         hero_info['coord_y'] = 1 * 64
         hero_info['tile_size'] = 64
         hero_info['rect'] = pygame.Rect(3 * 64, 1 * 64, 64, 64)
         self.hero = Hero(hero_info)
+        hero_info['rect'] = pygame.Rect(6 * 64, 6 * 64, 64, 64)
+        self.monster = Monster(hero_info)
 
         topology = build_temple()
         #
@@ -61,6 +64,9 @@ class Game():
             self.blocks.add(Door(topology['door_sprite'], door))
         self.sprites = sprite.Group()
         self.sprites.add(self.hero)
+
+        self.sprites_monster = sprite.Group()
+        self.sprites_monster.add(self.monster)
 
 
 
@@ -96,6 +102,7 @@ class Game():
 
     def _update(self):
         self.sprites.update()
+        self.sprites_monster.update(self.quad_walls)
         self.camera.update(self.hero)
 
     def _draw(self):
@@ -103,7 +110,8 @@ class Game():
             self.screen.blit(b.image, self.camera.apply(b))
         for s in self.sprites:
             self.screen.blit(s.image, self.camera.apply(s))
-
+        for s in self.sprites_monster:
+            self.screen.blit(s.image, self.camera.apply(s))
 
         hh = self._hud_health.update(self.hero.hero_infos['cur_hp'], self.hero.hero_infos['max_hp'])
         self.screen.blit(hh['label'], hh['at'])
