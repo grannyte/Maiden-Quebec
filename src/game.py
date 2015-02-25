@@ -65,9 +65,12 @@ class Game():
         self.sprites = sprite.Group()
         self.sprites.add(self.hero)
         self.entities = sprite.Group()
+<<<<<<< HEAD
 
         self.sprites_monster = sprite.Group()
         self.sprites_monster.add(self.monster)
+=======
+>>>>>>> ed633d4edaf74e6b587a9510cb506c60fe355cbf
 
 
 
