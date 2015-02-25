@@ -16,14 +16,14 @@ def init_project_directory():
     full_path = realpath(__file__)
     return dirname(full_path)
 
-project_directory = init_project_directory()
-database_schema = join(project_directory, 'data', 'maiden-quebec.sql')
-database = join(project_directory, 'data', 'maiden-quebec.db')
-zik = join(project_directory, 'data', 'zik')
-img = join(project_directory, 'data', 'img')
-snd = join(project_directory, 'data', 'snd')
+if 'project_directory' not in locals():
+    project_directory = init_project_directory()
+    zik = join(project_directory, 'data', 'zik')
+    img = join(project_directory, 'data', 'img')
+    tile = join(project_directory, 'data', 'img', 'tiles')
+    snd = join(project_directory, 'data', 'snd')
 
-# TODO: Offer GUI to change language
-# TODO: Offer dict or database to handle messages
-languages = ("english", "french")
-language = languages[0]
+    # TODO: Offer GUI to change language
+    # TODO: Offer dict or database to handle messages
+    languages = ("english", "french")
+    language = languages[0]

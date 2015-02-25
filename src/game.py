@@ -10,6 +10,10 @@ import pygame
 from pygame import *
 from src.camera import ComplexCamera
 from src.sprite.hero import Hero
+from src.sprite.topology import build_temple
+from src.sprite.wall import Wall
+from src.sprite.floor import Floor
+from src.sprite.door import Door
 from src.hud.hud_health import HudHealth
 
 from config import init_project_directory
@@ -45,13 +49,16 @@ class Game():
         hero_info['rect'] = pygame.Rect(3 * 64, 1 * 64, 64, 64)
         self.player = Hero(hero_info)
 
-        map_info = dict()
-
-        #self.dongeon = Map(map_info)
+        topology = build_temple()
         # Those are updated by the server
-        self.entities = sprite.Group()
-        self.sprites = sprite.Group()
         self.blocks = sprite.Group()
+        for wall in topology['walls']:
+            self.blocks.add(Wall(topology['wall_sprite'], wall))
+        for floor in topology['floors']:
+            self.blocks.add(Floor(topology['floor_sprite'], floor))
+        for door in topology['doors']:
+            self.blocks.add(Door(topology['door_sprite'], door))
+        self.sprites = sprite.Group()
         self.sprites.add(self.player)
 
         # self.screen = pygame.display.set_mode((800, 600), pygame.FULLSCREEN | pygame.HWSURFACE)
@@ -81,16 +88,15 @@ class Game():
             self._draw()
 
     def _update(self):
-        self.entities.update(self.blocks)
         self.sprites.update()
         self.camera.update(self.player)
 
     def _draw(self):
+        for b in self.blocks:
+            self.screen.blit(b.image, self.camera.apply(b))
         for s in self.sprites:
             self.screen.blit(s.image, self.camera.apply(s))
 
-        for e in self.entities:
-            self.screen.blit(e.image, self.camera.apply(e))
 
         hh = self._hud_health.update(8, 32)
         self.screen.blit(hh['label'], hh['at'])

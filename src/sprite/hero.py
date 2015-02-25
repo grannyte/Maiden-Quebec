@@ -20,7 +20,7 @@ class Hero(pygame.sprite.Sprite):
         self.player_infos = player_infos
         self.rect = player_infos['rect']
         sprite_sheet = Spritesheet("/home/plperron/PycharmProjects/Maiden-Quebec/data/img/spritesheets/male.png")
-        self.image = sprite_sheet.image_at(pygame.Rect(0, 0, 64, 64))
+        self.image = sprite_sheet.image_at(pygame.Rect(0, 0, 64, 64), (0, 0, 0))
 
     def control(self, key_pressed):
         pass
