@@ -23,49 +23,70 @@ class Monster(pygame.sprite.Sprite):
         self.hero_infos = monster_infos
         self.rect = monster_infos['rect']
         self.tile_size = monster_infos['tile_size']
-        sprite_sheet = Spritesheet(join(img, 'spritesheets', 'red_ork.png'))
-        self.image = sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0))
+        self.sprite_sheet = Spritesheet(join(img, 'spritesheets', 'male.png'))
+        self.image = self.sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0))
         # Control
-        self.isStandingStill = True
-        self.direction = 'up'
-        self.direction_count = 0
-        self.random = random.randrange(1,5)*64
+        self.actions = dict()
+        self.actions['standing'] = {
+            'north': self.sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0)),
+            'west': self.sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0)),
+            'south': self.sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0)),
+            'east': self.sprite_sheet.image_at(pygame.Rect(0, 2 * 64, 64, 64), (0, 0, 0)),
+        }
+        self.actions['walking'] = {
+            'north': self.sprite_sheet.image_at(pygame.Rect(0, 8 * 64, 64, 64), (0, 0, 0)),
+            'west': self.sprite_sheet.image_at(pygame.Rect(0, 9 * 64, 64, 64), (0, 0, 0)),
+            'south': self.sprite_sheet.image_at(pygame.Rect(0, 10 * 64, 64, 64), (0, 0, 0)),
+            'east': self.sprite_sheet.image_at(pygame.Rect(0, 11 * 64, 64, 64), (0, 0, 0)),
+        }
+        self.actions['attacking'] = {
+            'north': self.sprite_sheet.image_at(pygame.Rect(4 * 64, 12 * 64, 64, 64), (0, 0, 0)),
+            'west': self.sprite_sheet.image_at(pygame.Rect(4 * 64, 13 * 64, 64, 64), (0, 0, 0)),
+            'south': self.sprite_sheet.image_at(pygame.Rect(4 * 64, 14 * 64, 64, 64), (0, 0, 0)),
+            'east': self.sprite_sheet.image_at(pygame.Rect(4 * 64, 15 * 64, 64, 64), (0, 0, 0)),
+        }
+        # Control
+        self.move = 0
+        self.action = 'standing'
+        self.facing = 'south'
+        self.image = self.actions[self.action][self.facing]
 
     def update(self, quad):
-        if(self.direction == 'up'):
-            self.rect.top -= 1
+        """
+        Tries to attack the player in the first place, he wanders around otherwise
+        :param quad:
+        :return:
+        """
+        if self.is_enemy_seen():
+            pass
+        elif self.move > 0:  # keep moving in the same direction
+            last_left, last_top, last_facing = self.rect.left, self.rect.top, self.facing
+            if self.facing == 'north':
+                self.rect.top -= 1
+            elif self.facing == 'south':
+                self.rect.top += 1
+            elif self.facing == 'west':
+                self.rect.left -= 1
+            elif self.facing == 'east':
+                self.rect.left += 1
+            self.move -= 1
             collision_rect = self.__collide_rect()
             collisions = quad.which_collide_with(collision_rect)
-            if len(collisions) > 0 or self.direction_count > self.random*64:
-                self.random = random.randrange(1,5)
-                self.direction = 'left'
-                self.direction_count = 0
-        elif(self.direction == 'left'):
-            self.rect.left -= 1
-            collision_rect = self.__collide_rect()
-            collisions = quad.which_collide_with(collision_rect)
-            if len(collisions) > 0 or self.direction_count > self.random*64:
-                self.random = random.randrange(1,5)
-                self.direction = 'down'
-                self.direction_count = 0
-        elif(self.direction == 'down'):
-            self.rect.top += 1
-            collision_rect = self.__collide_rect()
-            collisions = quad.which_collide_with(collision_rect)
-            if len(collisions) > 0 or self.direction_count > self.random*64:
-                self.random = random.randrange(1,5)
-                self.direction = 'right'
-                self.direction_count = 0
-        else:
-            self.rect.left += 1
-            collision_rect = self.__collide_rect()
-            collisions = quad.which_collide_with(collision_rect)
-            if len(collisions) > 0 or self.direction_count > self.random*64:
-                self.random = random.randrange(1,5)
-                self.direction = 'up'
-                self.direction_count = 0
-        self.direction_count += 1
+            if len(collisions) > 0:
+                self.rect.left, self.rect.top, self.facing = last_left, last_top, last_facing
+        else:  # Otherwise he wanders around
+            directions = ['north', 'south', 'west', 'east']
+            rand = random.randint(0, len(directions) * 128 - 1)
+            if rand % 128 == 0:
+                rand = int(rand / 128)
+                self.facing = directions[rand]
+                self.move = 64
 
+
+
+
+    def is_enemy_seen(self):
+        return False
 
     def __collide_rect(self):
         """
