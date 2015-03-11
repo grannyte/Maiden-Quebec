@@ -35,6 +35,7 @@ def main():
     world.initial_state(librpg.util.Position(10, 10), ['Andy'])
     world.gameloop()
 
+
     exit()
 
 
