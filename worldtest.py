@@ -4,7 +4,7 @@ from worldtest.myworld import MyWorld
 
 
 def main():
-    librpg.init()
+    librpg.init('Maiden-Quebec')
 
     # Config graphics
     librpg.config.graphics_config.config(tile_size=32, object_height=32,
