@@ -18,6 +18,7 @@ UPPER_TILESET = [(tileset_path('world_upper.png'),
 HP_INITIAL = 100
 HAUT_TOUR = 12
 BAS_TOUR = 22
+PARTY = 0
 
 class SavePoint(ScenarioMapObject):
     def __init__(self, map):
@@ -109,6 +110,39 @@ class Guard(MapObject):
     def update(self):
         pass
 
+class CrazyMonster(MapObject):
+    def __init__(self, map):
+        MapObject.__init__(self, MapObject.OBSTACLE,
+                           image_file='hulk.png')
+        self.movement_behavior.movements.extend([])
+        self.hp = HP_INITIAL
+        self.map = map
+        self.party_position = self.map.objects[PARTY].position
+
+    def activate(self, party_avatar, direction):
+        self.hp -= 10
+        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
+        if(self.hp <= 0):
+            print(u'Le monstre est mort.')
+            self.destroy()
+
+    def collide_with_party(self, party_avatar, direction):
+        print('defense')
+
+    def update(self):
+        # Code laid mais au moins on peut tester!
+        if(self.map.objects[PARTY].position.x != self.party_position.x or
+           self.map.objects[PARTY].position.y != self.party_position.y):
+            self.party_position = self.map.objects[PARTY].position
+            if(self.map.monster.position.x > self.party_position.x):
+                self.map.monster.schedule_movement(ForcedStep(LEFT), False)
+            else:
+                self.map.monster.schedule_movement(ForcedStep(RIGHT), False)
+
+            if(self.map.monster.position.y > self.party_position.y):
+                self.map.monster.schedule_movement(ForcedStep(UP), False)
+            else:
+                self.map.monster.schedule_movement(ForcedStep(DOWN), False)
 
 class ProtectedArea(MapArea):
     def __init__(self, map, movements):
@@ -212,6 +246,9 @@ class Map5(WorldMap):
 
     def initialize(self, local_state, global_state):
         self.add_area(RelativeTeleportArea(x_offset=+8, map_id=4), RectangleArea((0, 4), (0, 5)))
+
+        self.monster = CrazyMonster(self)
+        self.add_object(self.monster, Position(7,7))
 
 
 class Map6(WorldMap):
