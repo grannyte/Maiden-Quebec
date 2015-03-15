@@ -20,6 +20,9 @@ HAUT_TOUR = 12
 BAS_TOUR = 22
 PARTY = 0
 
+GUARD_WALK = 1
+GUARD_OBSERVE = 2
+
 class SavePoint(ScenarioMapObject):
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 1)
@@ -144,6 +147,100 @@ class CrazyMonster(MapObject):
             else:
                 self.map.monster.schedule_movement(ForcedStep(DOWN), False)
 
+class SmartMonster(MapObject):
+    def __init__(self, map):
+        MapObject.__init__(self, MapObject.OBSTACLE,
+                           image_file='hulk.png')
+        self.movement_behavior.movements.extend([])
+        self.hp = HP_INITIAL
+        self.map = map
+        self.party_position = self.map.objects[PARTY].position
+        self.state = GUARD_WALK
+        self.corner = (8,1)
+
+    def activate(self, party_avatar, direction):
+        self.hp -= 10
+        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
+        if(self.hp <= 0):
+            print(u'Le monstre est mort.')
+            self.destroy()
+
+    def collide_with_party(self, party_avatar, direction):
+        print('defense')
+
+    def update(self):
+        if(self.state == GUARD_WALK):
+                self.map.monster.schedule_movement(ForcedStep(DOWN), False)
+                self.map.monster.schedule_movement(Wait(10), False)
+                self.map.monster.schedule_movement(ForcedStep(LEFT), False)
+                self.map.monster.schedule_movement(Wait(10), False)
+                self.map.monster.schedule_movement(ForcedStep(UP), False)
+                self.map.monster.schedule_movement(Wait(10), False)
+                self.map.monster.schedule_movement(ForcedStep(RIGHT), False)
+                self.map.monster.schedule_movement(Wait(10), False)
+
+                proximity = self.detect_proximity()
+                if(proximity != 0):
+                    self.state = GUARD_OBSERVE
+                    self.map.monster.schedule_movement(Wait(2), True)
+        else:
+            self.goto_corner()
+
+    def goto_corner(self):
+        x, _ = self.corner
+        if(x == 8):
+            self.goto_up_right_corner()
+        else:
+            self.goto_down_left_corner()
+
+    def goto_up_right_corner(self):
+            x, y = self.corner
+
+            if(self.detect_proximity() == RIGHT):
+                self.map.monster.schedule_movement(ForcedStep(UP), True)
+            elif(self.map.monster.position.x != x):
+                self.map.monster.schedule_movement(ForcedStep(RIGHT), True)
+            elif(self.map.monster.position.y != y):
+                self.map.monster.schedule_movement(ForcedStep(UP), True)
+            else:
+                self.map.monster.schedule_movement(Face(DOWN), True)
+                proximity = self.detect_proximity()
+                if(proximity != 0):
+                    self.corner = (1,8)
+
+    def goto_down_left_corner(self):
+            x, y = self.corner
+
+            # If the party is in the way, change row
+            if(self.detect_proximity() == LEFT):
+                self.map.monster.schedule_movement(ForcedStep(DOWN), True)
+            elif(self.map.monster.position.x != x):
+                self.map.monster.schedule_movement(ForcedStep(LEFT), True)
+            elif(self.map.monster.position.y != y):
+                self.map.monster.schedule_movement(ForcedStep(DOWN), True)
+            else:
+                self.map.monster.schedule_movement(Face(UP), True)
+                proximity = self.detect_proximity()
+                if(proximity != 0):
+                    self.corner = (8,1)
+
+    def detect_proximity(self):
+        if(self.map.monster.position.x == self.map.objects[PARTY].position.x and
+           self.map.monster.position.y == self.map.objects[PARTY].position.y + 1):
+            return UP
+        elif(self.map.monster.position.x == self.map.objects[PARTY].position.x and
+           self.map.monster.position.y == self.map.objects[PARTY].position.y - 1):
+            return DOWN
+        elif(self.map.monster.position.y == self.map.objects[PARTY].position.y and
+           self.map.monster.position.x == self.map.objects[PARTY].position.x + 1):
+            return LEFT
+        elif(self.map.monster.position.y == self.map.objects[PARTY].position.y and
+           self.map.monster.position.x == self.map.objects[PARTY].position.x - 1):
+            return RIGHT
+        else:
+            return 0
+
+
 class ProtectedArea(MapArea):
     def __init__(self, map, movements):
         self.map = map
@@ -259,5 +356,17 @@ class Map6(WorldMap):
 
     def initialize(self, local_state, global_state):
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=4), RectangleArea((8, 9), (8, 9)))
+        self.add_area(RelativeTeleportArea(x_offset=-8, map_id=7), RectangleArea((9, 4), (9, 5)))
         self.add_object(SavePoint(self), Position(4, 4))
 
+class Map7(WorldMap):
+    def __init__(self):
+        WorldMap.__init__(self, 'worldtest/map7.map',
+                          LOWER_TILESET,
+                          UPPER_TILESET)
+
+    def initialize(self, local_state, global_state):
+        self.add_area(RelativeTeleportArea(x_offset=+8, map_id=6), RectangleArea((0, 4), (0, 5)))
+
+        self.monster = SmartMonster(self)
+        self.add_object(self.monster, Position(5,4))
