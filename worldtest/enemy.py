@@ -17,6 +17,10 @@ class Enemy(MapObject):
 class Hero(Enemy):
     def __init__(self):
         self.hp = 100
+        self.position = None
+
+    def update_position(self, position):
+        self.position = position
 
 
 class Common(Enemy):

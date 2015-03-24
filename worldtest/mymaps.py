@@ -282,11 +282,11 @@ class Map1(WorldMap):
                           UPPER_TILESET)
 
     def initialize(self, local_state, global_state):
-        print(hero.hp)
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=2), RectangleArea((9, 2), (9, 8)))
         self.add_object(MessagePoint(self,HAUT_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 3))
         self.add_object(MessagePoint(self,BAS_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 4))
-
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
 class Map2(WorldMap):
     def __init__(self):
@@ -300,6 +300,8 @@ class Map2(WorldMap):
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=3), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
         self.add_object(SavePoint(self), Position(5, 2))
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
 
 class Map3(WorldMap):
@@ -319,6 +321,8 @@ class Map3(WorldMap):
         else:
             self.chest = Chest()
         self.add_object(self.chest, Position(9, 5))
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
     def save_state(self):
         return {'chest_closed': self.chest.closed}
@@ -343,6 +347,8 @@ class Map4(WorldMap):
 
         self.add_object(MessagePoint(self,HAUT_TOUR,u'Sage de la tour: Bravo! Belle idée de venir ici!'), Position(1, 5))
         self.add_object(MessagePoint(self,BAS_TOUR,u'Sage de la tour: Bravo! Belle idée de venir ici!'), Position(1, 6))
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
 
 class Map5(WorldMap):
@@ -356,7 +362,8 @@ class Map5(WorldMap):
 
         self.monster = CrazyMonster(self)
         self.add_object(self.monster, Position(7,7))
-
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
 class Map6(WorldMap):
     def __init__(self):
@@ -368,6 +375,8 @@ class Map6(WorldMap):
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=4), RectangleArea((8, 9), (8, 9)))
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=7), RectangleArea((9, 4), (9, 5)))
         self.add_object(SavePoint(self), Position(4, 4))
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
 
 class Map7(WorldMap):
     def __init__(self):
@@ -380,3 +389,5 @@ class Map7(WorldMap):
 
         self.monster = SmartMonster(self)
         self.add_object(self.monster, Position(5,4))
+        hero.update_position(self.objects[PARTY].position)
+        print(hero.position)
