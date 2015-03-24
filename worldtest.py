@@ -2,6 +2,7 @@ import librpg
 
 from worldtest.myworld import MyWorld
 
+hero_hp = 100 # TODO: do better
 
 def main():
     librpg.init('Maiden-Quebec')
