@@ -1,5 +1,5 @@
 #The directory contains a set of configuration files within an IntelliJ project.
 .idea/
 #Python compile a program to bytecode first and stores it in the __pycache__.
+**/*.pyc
 **/__pycache__
-data/level00.map
