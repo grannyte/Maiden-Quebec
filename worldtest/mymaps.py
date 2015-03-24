@@ -10,6 +10,10 @@ from librpg.locals import *
 from librpg.path import *
 from librpg.collection.maparea import RelativeTeleportArea
 
+from worldtest.enemy import Hero
+
+hero = Hero()
+
 SAVE_FILE = 'save'
 LOWER_TILESET = (tileset_path('city_lower.png'),
                  tileset_path('city_lower.bnd'))
@@ -88,7 +92,11 @@ class Monster(MapObject):
             self.destroy()
 
     def collide_with_party(self, party_avatar, direction):
-        print('defense')
+        hero.hp -= 10
+        self.schedule_movement(Wait(5))
+        if hero.hp <= 0:
+            print("die bitch")
+        print(hero.hp)
 
     def update(self):
         pass
@@ -274,6 +282,7 @@ class Map1(WorldMap):
                           UPPER_TILESET)
 
     def initialize(self, local_state, global_state):
+        print(hero.hp)
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=2), RectangleArea((9, 2), (9, 8)))
         self.add_object(MessagePoint(self,HAUT_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 3))
         self.add_object(MessagePoint(self,BAS_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 4))
@@ -286,6 +295,7 @@ class Map2(WorldMap):
                           UPPER_TILESET)
 
     def initialize(self, local_state, global_state):
+        print(hero.hp)
         self.add_area(RelativeTeleportArea(x_offset=+8, map_id=1), RectangleArea((0, 2), (0, 7)))
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=3), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))

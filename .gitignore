@@ -3,3 +3,4 @@
 #Python compile a program to bytecode first and stores it in the __pycache__.
 **/*.pyc
 **/__pycache__
+save

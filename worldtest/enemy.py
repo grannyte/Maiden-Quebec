@@ -1,12 +1,22 @@
 from __future__ import print_function
 
-"""
-Le module définit les ennemies posssible à rencontrer
-"""
+"Le module definit les ennemies posssible a rencontrer"
 
 
-class Enemy(object):
-    pass
+from librpg.mapobject import MapObject
+
+
+class Enemy(MapObject):
+    def __init__(self):
+        MapObject.__init__(self, MapObject.OBSTACLE,
+                           image_file='hulk.png')
+        self.__next_action = []
+        self.hp = 100
+
+
+class Hero(Enemy):
+    def __init__(self):
+        self.hp = 100
 
 
 class Common(Enemy):
@@ -15,5 +25,6 @@ class Common(Enemy):
 
 class Boss(Enemy):
     pass
+
 
 __author__ = 'plperron'
