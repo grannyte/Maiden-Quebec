@@ -315,7 +315,7 @@ class Map2(WorldMap):
         self.add_object(SavePoint(self), Position(5, 2))
         hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
-        self.monster = Common(self, hero)
+        self.monster = BayesMonster(self, hero)
         self.add_object(self.monster, Position(4, 4))
         print("DEBUG" + str(self.monster.position))
 

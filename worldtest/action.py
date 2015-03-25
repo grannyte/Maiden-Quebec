@@ -17,10 +17,13 @@ class Fight(Movement):
 
     def flow(self, obj):
         if euclidian_distance(self.pos1, self.pos2) == 1:
+            print("enemy1 %s and enemy2 %s" % (type(self.enemy1.action).__name__, type(self.enemy2.action).__name__))
             interaction(self.enemy1, self.enemy2)
             interaction(self.enemy2, self.enemy1)
-            self.enemy1.action = Wait(20)
-            self.enemy2.action = Wait(20)
+            if isinstance(self.enemy1.action, Fight):
+                self.enemy1.action = Wait(8)
+            if isinstance(self.enemy2.action, Fight):
+                self.enemy2.action = Wait(8)
             try:
                 self.enemy1.schedule_movement(self.enemy1.action, False)
             except AttributeError:
@@ -28,7 +31,7 @@ class Fight(Movement):
             try:
                 self.enemy2.schedule_movement(self.enemy2.action, False)
             except AttributeError:
-                self.enemy1.map_object.schedule_movement(self.enemy1.action, False)
+                self.enemy2.map_object.schedule_movement(self.enemy2.action, False)
         return True, True
 
 
@@ -63,23 +66,16 @@ def euclidian_distance(pos1, pos2):
 
 def interaction(enemy1, enemy2):
     if type(enemy1.action).__name__ == "Attack" and type(enemy2.action).__name__ == "Attack":
-        print(1)
         enemy1.emousser *= 0.95
         enemy2.emousser *= 0.95
+        enemy1.counters["pared"] += 1
+        enemy2.counters["pared"] += 1
     elif type(enemy1.action).__name__ == "Attack" and type(enemy2.action).__name__ == "Defence":
-        print(2)
         enemy1.emousser *= 0.85
         enemy2.hp -= enemy1.emousser * 2
+        enemy1.counters["blocked"] += 1
     elif type(enemy1.action).__name__ == "Attack":
-        print(3)
         enemy2.hp -= enemy1.emousser * 8
-    elif type(enemy1.action).__name__ == "Defence" and type(enemy2.action).__name__  == "Attack":
-        print(4)
-        enemy1.hp -= enemy1.emousser * 2
-        enemy2.emousser *= 0.85
-        print(5)
-    print(6)
-    print(enemy1.hp)
-    print(enemy2.hp)
+        enemy2.counters["cutted"] += 1
 
 __author__ = 'plperron'

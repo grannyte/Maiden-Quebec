@@ -8,6 +8,7 @@ from librpg.movement import *
 from librpg.locals import *
 
 from action import *
+from bayes.inference import *
 
 
 class Enemy(MapObject):
@@ -18,6 +19,7 @@ class Enemy(MapObject):
         self.hp = 256
         self.action = Face(DOWN)
         self.emousser = 1.0
+        self.counters = {"cutted": 0, "blocked": 0, "pared": 0}
 
     def update_position(self, position):
         self.position = position
@@ -31,41 +33,57 @@ class Hero(Enemy):
         self.hp = 64
         self.action = Wait(10)
         self.emousser = 1.0
+        self.counters = {"cutted": 0, "blocked": 0, "pared": 0}
         self.map_object = None
 
     def ref(self, map_object):
         self.map_object = map_object
 
 
-class Common(Enemy):
+class BayesMonster(Enemy):
     def __init__(self, map, hero):
         MapObject.__init__(self, MapObject.OBSTACLE,
                            image_file='hulk.png')
         Enemy.__init__(self, map)
         self.hero = hero
-        self.action = Attack
+        self.hero.counters = {"cutted": 0, "blocked": 0, "pared": 0} #reset
+        self.bayes = Bayes(self, self.hero)
+        self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
 
     def update(self):
         # print("pos hero: %s et pos monstre %s" % (self.hero.action, self.action))
+        next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
+        if "Attack" == next_action:
+            self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
+            self.schedule_movement(self.action, False)
+        if "Defence" == next_action:
+            self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
+            self.schedule_movement(self.action, False)
         if self.hp <= 0:
             print (u'Le monstre est mort.')
             self.destroy()
 
+    def estimate_enemy_hp(self):
+        return "more" if self.hero.counters["cutted"] < self.counters["cutted"] else "less"
+
+    def estimate_enemy_erode(self):
+        h = self.hero.counters["blocked"] + self.hero.counters["pared"]
+        m = self.hero.counters["blocked"] + self.hero.counters["pared"]
+        return "more" if h > m else "less"
+
     def activate(self, party_avatar, direction):
-        # self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
-        # self.schedule_movement(self.action, False)
         self.hero.action = Attack((self.hero, self.hero.map_object.position), (self, self.position))
         self.hero.map_object.schedule_movement(self.hero.action, False)
 
     def collide_with_party(self, party_avatar, direction):
-        self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
         self.hero.action = Defence((self.hero, self.hero.map_object.position), (self, self.position))
+        self.hero.map_object.schedule_movement(self.hero.action, False)
 
 
-class Boss(Enemy):
-    def __init__(self, map):
-        MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+#class Boss(Enemy):
+#    def __init__(self, map):
+#        MapObject.__init__(self, MapObject.OBSTACLE,
+#                           image_file='hulk.png')
 
 
 
