@@ -13,7 +13,7 @@ class Enemy(MapObject):
         MapObject.__init__(self, MapObject.OBSTACLE,
                            image_file='hulk.png')
         self.map = map
-        self.hp = 128
+        self.hp = 16
         self.action = Face(DOWN)
         self.emousser = 1.0
 
@@ -26,8 +26,9 @@ class Enemy(MapObject):
 
 class Hero(Enemy):
     def __init__(self):
-        self.hp = 128
+        self.hp = 64
         self.action = "still"
+        self.emousser = 1.0
         self.map_object = None
 
     def ref(self, map_object):
@@ -43,9 +44,24 @@ class Common(Enemy):
         self.action = "attack"
 
     def update(self):
-        print("pos hero: %s et pos monstre %s" % (self.hero.map_object.position, self.position))
+        print("pos hero: %s et pos monstre %s" % (self.hero.action, self.action))
         if euclidian_distance(self.hero.map_object.position, self.position) == 1:
-            print("easy")
+            if self.hero.action != "still" or self.action != "still":
+                interaction(self.hero, self)
+                interaction(self, self.hero)
+                self.hero.action = "still"
+                self.action = "still"
+                self.hero.map_object.schedule_movement(Wait(10))
+                self.schedule_movement(Wait(10))
+                if (self.hp <= 0):
+                    print (u'Le monstre est mort.')
+                    self.destroy()
+
+    def activate(self, party_avatar, direction):
+        self.hero.action = "attack"
+
+    def collide_with_party(self, party_avatar, direction):
+        self.hero.action = "defence"
 
 
 class Boss(Enemy):
@@ -59,6 +75,8 @@ def euclidian_distance(pos1, pos2):
 
 
 def interaction(enemy1, enemy2):
+    if enemy1.action != "still" or enemy2.action != "still":
+        print("hero: %s et monstre %s" % (enemy1.action, enemy2.action))
     if enemy1.action == "attack" and enemy2.action == "attack":
         enemy1.emousser *= 0.95
         enemy2.emousser *= 0.95
@@ -67,13 +85,11 @@ def interaction(enemy1, enemy2):
         enemy2.hp -= enemy1.emousser * 2
     elif enemy1.action == "attack":
         enemy2.hp -= enemy1.emousser * 8
-    elif enemy1.action == "defence" and enemy2.action == "attack":
+    elif enemy1.action == "defence" and enemy2.action  == "attack":
         enemy1.hp -= enemy1.emousser * 2
         enemy2.emousser *= 0.85
-    else:
-        interaction(enemy2, enemy1)
-    enemy1.schedule_movement(Wait(UP), True)
-    enemy2.schedule_movement(Wait(UP), True)
+    print(enemy1.hp)
+    print(enemy2.hp)
 
 
 __author__ = 'plperron'
