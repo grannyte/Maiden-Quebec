@@ -151,15 +151,15 @@ class CrazyMonster(MapObject):
         if (self.map.objects[PARTY].position.x != self.party_position.x or
                     self.map.objects[PARTY].position.y != self.party_position.y):
             self.party_position = self.map.objects[PARTY].position
-            if (self.map.monster.position.x > self.party_position.x):
-                self.map.monster.schedule_movement(ForcedStep(LEFT), False)
-            else:
-                self.map.monster.schedule_movement(ForcedStep(RIGHT), False)
+            if (self.position.x > self.party_position.x):
+                self.schedule_movement(ForcedStep(LEFT), False)
+            elif (self.position.x < self.party_position.x):
+                self.schedule_movement(ForcedStep(RIGHT), False)
 
-            if (self.map.monster.position.y > self.party_position.y):
-                self.map.monster.schedule_movement(ForcedStep(UP), False)
-            else:
-                self.map.monster.schedule_movement(ForcedStep(DOWN), False)
+            if (self.position.y > self.party_position.y):
+                self.schedule_movement(ForcedStep(UP), False)
+            elif (self.position.y < self.party_position.y):
+                self.schedule_movement(ForcedStep(DOWN), False)
 
 
 class SmartMonster(MapObject):
@@ -312,6 +312,7 @@ class Map2(WorldMap):
         self.add_area(RelativeTeleportArea(x_offset=+8, map_id=1), RectangleArea((0, 2), (0, 7)))
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=3), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
+        self.add_area(RelativeTeleportArea(y_offset=-8, map_id=8), RectangleArea((4, 9), (5, 9)))
         self.add_object(SavePoint(self), Position(5, 2))
         hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
