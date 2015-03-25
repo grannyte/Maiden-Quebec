@@ -4,7 +4,7 @@ from librpg.world import WorldMap
 from librpg.mapobject import ScenarioMapObject, MapObject
 from librpg.maparea import RectangleArea, MapArea
 from librpg.util import Position
-from librpg.movement import Face, Wait, ForcedStep
+from librpg.movement import Face, Wait, ForcedStep, Slide
 from librpg.dialog import MessageDialog
 from librpg.locals import *
 from librpg.path import *
@@ -66,6 +66,22 @@ class Chest(MapObject):
             self.closed = True
         print u'Bravo vous avez complété le jeu.'
         self.map.gameover()
+
+
+class MazeBoulder(ScenarioMapObject):
+    def __init__(self, map):
+        ScenarioMapObject.__init__(self, map, 0, 5)
+
+    def activate(self, party_avatar, direction):
+        self.schedule_movement(Slide(direction))
+
+
+class SpecialBoulder(ScenarioMapObject):
+    def __init__(self, map):
+        ScenarioMapObject.__init__(self, map, 0, 5)
+
+    def activate(self, party_avatar, direction):
+        print("Votre épée vient de s'aiguiser sur la roche!")
 
 
 class Monster(MapObject):
@@ -355,6 +371,7 @@ class Map6(WorldMap):
                           UPPER_TILESET)
 
     def initialize(self, local_state, global_state):
+        self.add_area(RelativeTeleportArea(y_offset=+8, map_id=8), RectangleArea((8, 0), (8, 0)))
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=4), RectangleArea((8, 9), (8, 9)))
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=7), RectangleArea((9, 4), (9, 5)))
         self.add_object(SavePoint(self), Position(4, 4))
@@ -370,3 +387,31 @@ class Map7(WorldMap):
 
         self.monster = SmartMonster(self)
         self.add_object(self.monster, Position(5,4))
+
+class Map8(WorldMap):
+    MAZE = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 2, 2, 0, 0, 2, 0, 0],
+    [0, 0, 2, 0, 0, 0, 2, 0, 2, 0],
+    [0, 2, 0, 0, 0, 2, 0, 0, 2, 0],
+    [0, 0, 2, 2, 2, 0, 0, 2, 0, 0],
+    [0, 2, 2, 0, 0, 0, 2, 2, 0, 0],
+    [0, 0, 0, 0, 2, 2, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+    def __init__(self):
+        WorldMap.__init__(self, 'worldtest/map8.map',
+                          LOWER_TILESET,
+                          UPPER_TILESET)
+
+    def initialize(self, local_state, global_state):
+        self.add_area(RelativeTeleportArea(y_offset=-8, map_id=6), RectangleArea((8, 9), (8, 9)))
+
+        for y, line in enumerate(Map8.MAZE):
+            for x, cell in enumerate(line):
+                if cell == 1:
+                    self.add_object(SpecialBoulder(self), Position(x, y))
+                elif cell == 2:
+                    self.add_object(MazeBoulder(self), Position(x, y))
