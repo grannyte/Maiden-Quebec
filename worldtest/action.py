@@ -42,4 +42,8 @@ class Defence(Fight):
 class Counter(Fight):
     pass
 
+
+def interact(a1, a2):
+    pass
+
 __author__ = 'plperron'
