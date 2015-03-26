@@ -72,7 +72,7 @@ class MazeBoulder(ScenarioMapObject):
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 5)
 
-    def activate(self, party_avatar, direction):
+    def collide_with_party(self, party_avatar, direction):
         self.schedule_movement(Slide(direction))
 
 
@@ -291,8 +291,8 @@ class Map1(WorldMap):
 
     def initialize(self, local_state, global_state):
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=2), RectangleArea((9, 2), (9, 8)))
-        self.add_object(MessagePoint(self,HAUT_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 3))
-        self.add_object(MessagePoint(self,BAS_TOUR,u'Vieil homme dans la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 4))
+        self.add_object(MessagePoint(self,HAUT_TOUR,u'Sage de la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 3))
+        self.add_object(MessagePoint(self,BAS_TOUR,u'Sage de la tour: Vous aviez bu trop de Maiden-Quebec et vous avez coulé votre navire.  Les vagues vous ont ramené sur le rivage, comptez vous chanceux d\'être en vie! Vous devriez retourner à la maison maintenant...'), Position(3, 4))
 
 
 class Map2(WorldMap):
