@@ -10,6 +10,7 @@ from librpg.movement import *
 
 
 class Fight(Movement):
+    DAMAGE = 10
 
     def __init__(self, enemy1, enemy2):
         self.enemy1, self.pos1 = enemy1
@@ -20,18 +21,8 @@ class Fight(Movement):
             print("enemy1 %s and enemy2 %s" % (type(self.enemy1.action).__name__, type(self.enemy2.action).__name__))
             interaction(self.enemy1, self.enemy2)
             interaction(self.enemy2, self.enemy1)
-            if isinstance(self.enemy1.action, Fight):
-                self.enemy1.action = Wait(8)
-            if isinstance(self.enemy2.action, Fight):
-                self.enemy2.action = Wait(8)
-            try:
-                self.enemy1.schedule_movement(self.enemy1.action, False)
-            except AttributeError:
-                self.enemy1.map_object.schedule_movement(self.enemy1.action, False)
-            try:
-                self.enemy2.schedule_movement(self.enemy2.action, False)
-            except AttributeError:
-                self.enemy2.map_object.schedule_movement(self.enemy2.action, False)
+            self.enemy1.action = ""
+            self.enemy2.action = ""
         return True, True
 
 
@@ -71,11 +62,12 @@ def interaction(enemy1, enemy2):
         enemy1.counters["pared"] += 1
         enemy2.counters["pared"] += 1
     elif type(enemy1.action).__name__ == "Attack" and type(enemy2.action).__name__ == "Defence":
-        enemy1.emousser *= 0.85
-        enemy2.hp -= enemy1.emousser * 2
+        enemy1.emousser *= 0.95
+        enemy2.hp -= (Fight.DAMAGE*enemy1.emousser)
         enemy1.counters["blocked"] += 1
     elif type(enemy1.action).__name__ == "Attack":
-        enemy2.hp -= enemy1.emousser * 8
+        enemy1.emousser *= 0.99
+        enemy2.hp -= (Fight.DAMAGE*enemy1.emousser)
         enemy2.counters["cutted"] += 1
 
 __author__ = 'plperron'
