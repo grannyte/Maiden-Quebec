@@ -108,10 +108,9 @@ class BayesMonster(Enemy):
 
 
 
-class Monster(MapObject):
-    def __init__(self):
-        MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+class Monster(BayesMonster):
+    def __init__(self, map, hero):
+        BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([Wait(30), ForcedStep(LEFT),
                                                  Wait(2), ForcedStep(UP),
                                                  Wait(2), ForcedStep(DOWN),
@@ -138,10 +137,9 @@ class Monster(MapObject):
         pass
 
 
-class Guard(MapObject):
-    def __init__(self):
-        MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+class Guard(BayesMonster):
+    def __init__(self, map, hero):
+        BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
 
@@ -156,13 +154,13 @@ class Guard(MapObject):
         print('defense')
 
     def update(self):
+        BayesMonster.update(self)
         pass
 
 
-class CrazyMonster(MapObject):
-    def __init__(self, map):
-        MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+class CrazyMonster(BayesMonster):
+    def __init__(self, map, hero):
+        BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
         self.map = map
@@ -180,24 +178,24 @@ class CrazyMonster(MapObject):
 
     def update(self):
         # Code laid mais au moins on peut tester!
+        BayesMonster.update(self)
         if (self.map.objects[PARTY].position.x != self.party_position.x or
                     self.map.objects[PARTY].position.y != self.party_position.y):
             self.party_position = self.map.objects[PARTY].position
             if (self.position.x > self.party_position.x):
-                self.schedule_movement(ForcedStep(LEFT), False)
+                self.schedule_movement(ForcedStep(LEFT), True)
             elif (self.position.x < self.party_position.x):
-                self.schedule_movement(ForcedStep(RIGHT), False)
+                self.schedule_movement(ForcedStep(RIGHT), True)
 
             if (self.position.y > self.party_position.y):
-                self.schedule_movement(ForcedStep(UP), False)
+                self.schedule_movement(ForcedStep(UP), True)
             elif (self.position.y < self.party_position.y):
-                self.schedule_movement(ForcedStep(DOWN), False)
+                self.schedule_movement(ForcedStep(DOWN), True)
 
 
-class SmartMonster(MapObject):
-    def __init__(self, map):
-        MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+class SmartMonster(BayesMonster):
+    def __init__(self, map, hero):
+        BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
         self.map = map
@@ -216,6 +214,7 @@ class SmartMonster(MapObject):
         print('defense')
 
     def update(self):
+        BayesMonster.update(self)
         if (self.state == GUARD_WALK):
             self.map.monster.schedule_movement(ForcedStep(DOWN), False)
             self.map.monster.schedule_movement(Wait(10), False)
