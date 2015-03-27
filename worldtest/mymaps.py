@@ -69,12 +69,31 @@ class Chest(MapObject):
         print u'Bravo vous avez complété le jeu.'
         self.map.gameover()
 
+
+class HealChest(MapObject):
+    def __init__(self, hero, closed=True):
+        self.hero = hero
+        MapObject.__init__(self, MapObject.OBSTACLE,
+                           image_file=charset_path('chest.png'),
+                           image_index=0,
+                           basic_animation=[[0]])
+        if closed:
+            self.facing = UP
+        self.closed = closed
+
+    def activate(self, party_avatar, direction):
+        self.hero.hp += 10
+        print u'Bravo vous avez trouve une bouteille de Maiden-Quebec dans ce coffre la boire vous a remonte le moral'
+        self.destroy()
+
+
+
 class MazeBoulder(ScenarioMapObject):
     def __init__(self, map):
         ScenarioMapObject.__init__(self, map, 0, 5)
 
     def collide_with_party(self, party_avatar, direction):
-        self.schedule_movement(Slide(direction))
+        self.schedule_movement(Slide(direction),True)
 
 
 class SpecialBoulder(ScenarioMapObject):
@@ -84,6 +103,13 @@ class SpecialBoulder(ScenarioMapObject):
     def activate(self, party_avatar, direction):
         print("Votre épée vient de s'aiguiser sur la roche!")
 
+
+class MazeLog(ScenarioMapObject):
+    def __init__(self, map):
+        ScenarioMapObject.__init__(self, map, 0, 2)
+
+    def collide_with_party(self, party_avatar, direction):
+        pass
 
 
 class ProtectedArea(MapArea):
@@ -112,6 +138,20 @@ class GameOverBarrel(ScenarioMapObject):
         self.map.gameover()
 
 
+class ExplosiveBarrel(ScenarioMapObject):
+    def __init__(self, map, hero):
+        self.hero = hero
+        ScenarioMapObject.__init__(self, map, 0, 4)
+
+    def activate(self, party_avatar, direction):
+        print u'Le barril explose.'
+        self.hero.hp -= 20
+        if self.hero.hp <= 1:
+                print("Vous etes mort")
+                self.map.gameover()
+        self.destroy()
+
+
 class Map1(WorldMap):
     def __init__(self):
         WorldMap.__init__(self, 'worldtest/map1.map',
@@ -135,7 +175,7 @@ class Map2(WorldMap):
     def initialize(self, local_state, global_state):
         print(hero.hp)
         self.add_area(RelativeTeleportArea(x_offset=+8, map_id=1), RectangleArea((0, 2), (0, 7)))
-        self.add_area(RelativeTeleportArea(x_offset=-8, map_id=3), RectangleArea((9, 2), (9, 7)))
+        self.add_area(RelativeTeleportArea(x_offset=-8, map_id=10), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=9), RectangleArea((4, 9), (5, 9)))
         self.add_object(SavePoint(self), Position(5, 2))
@@ -156,7 +196,7 @@ class Map3(WorldMap):
         self.add_object(GameOverBarrel(self), Position(9, 3))
         self.add_object(GameOverBarrel(self), Position(9, 7))
         self.add_object(Monster(self, hero), Position(8, 5))
-        self.add_area(RelativeTeleportArea(x_offset=+8, map_id=2), RectangleArea((0, 3), (0, 6)))
+        self.add_area(RelativeTeleportArea(x_offset=+8, map_id=10 ), RectangleArea((0, 3), (0, 6)))
 
         if local_state is not None:
             self.chest = Chest(local_state['chest_closed'])

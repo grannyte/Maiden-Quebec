@@ -427,19 +427,21 @@ class LSystemMap(WorldMap):
         self.Lsystem = LSystem(3, result)
         self.Lsystem .append_gene(Gene("T", "B<MTBE"))
         self.Lsystem .append_gene(Gene("E", "B[TB]T"))
-        self.Lsystem .append_gene(Gene("M", "(T<MB)"))
+        self.Lsystem .append_gene(Gene("M", "(T<MLB)"))
         self.Lsystem .append_gene(Gene("S", "BT>MB<S"))
-        self.MAZE = self.Lsystem .buildmap(8,8)
+        self.Lsystem .append_gene(Gene("L", "MMLR"))
+        self.Lsystem .append_gene(Gene("MM", "BMCMB"))
+        self.MAZE = self.Lsystem .buildmap(6,6)
         WorldMap.__init__(self, 'worldtest/LSystem.map',
                           LOWER_TILESET,
                           UPPER_TILESET)
 
     def initialize(self, local_state, global_state):
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=2), RectangleArea((4, 0), (5, 0)))
-        x = 0
+        x = 1
         for line in self.MAZE:
             x += 1
-            y = 0
+            y = 1
             print(line)
             for char in line:
                 y += 1
@@ -449,6 +451,64 @@ class LSystemMap(WorldMap):
                     self.add_object(MazeBoulder(self), Position(x, y))
                 elif char == 'M':
                     self.add_object(CrazyMonster(self, hero), Position(x, y))
+                elif char == 'C':
+                    self.add_object(HealChest(hero), Position(x, y))
+                elif char == 'R':
+                    self.add_object(ExplosiveBarrel(self,hero), Position(x, y))
+                elif char == 'L':
+                    self.add_object(MazeLog(self), Position(x, y))
+
+        hero.update_position(self.objects[PARTY].position)
+        hero.ref(self.objects[PARTY])
+        print(hero.position)
+
+    def find(self, keycharacter):
+        value = 0
+        if keycharacter in self.ObjectMap:
+            value = self.ObjectMap[keycharacter]
+        return value
+
+
+
+class LSystemMap2(WorldMap):
+    def __init__(self):
+        l = list("BGTEBMM")
+        random.shuffle(l)
+        result = ''.join(l)
+        self.Lsystem = LSystem(3, result)
+        self.Lsystem .append_gene(Gene("T", "B<MTBE"))
+        self.Lsystem .append_gene(Gene("E", "B[TB]T"))
+        self.Lsystem .append_gene(Gene("M", "(T<MLB)L"))
+        self.Lsystem .append_gene(Gene("S", "BT>MB<S"))
+        self.Lsystem .append_gene(Gene("L", "MMLR"))
+        self.Lsystem .append_gene(Gene("MM", "BMCMB"))
+        self.MAZE = self.Lsystem .buildmap(6,6)
+        WorldMap.__init__(self, 'worldtest/LSystem2.map',
+                          LOWER_TILESET,
+                          UPPER_TILESET)
+
+    def initialize(self, local_state, global_state):
+        self.add_area(RelativeTeleportArea(x_offset=+8, map_id=2), RectangleArea((0, 2), (0, 7)))
+        self.add_area(RelativeTeleportArea(x_offset=-8, map_id=3), RectangleArea((9, 2), (9, 7)))
+        x = 1
+        for line in self.MAZE:
+            x += 1
+            y = 1
+            print(line)
+            for char in line:
+                y += 1
+                if char == 'S':
+                    self.add_object(SpecialBoulder(self), Position(x, y))
+                elif char == 'B':
+                    self.add_object(MazeBoulder(self), Position(x, y))
+                elif char == 'M':
+                    self.add_object(CrazyMonster(self, hero), Position(x, y))
+                elif char == 'C':
+                    self.add_object(HealChest(hero), Position(x, y))
+                elif char == 'R':
+                    self.add_object(ExplosiveBarrel(self,hero), Position(x, y))
+                elif char == 'L':
+                    self.add_object(MazeLog(self), Position(x, y))
 
         hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])

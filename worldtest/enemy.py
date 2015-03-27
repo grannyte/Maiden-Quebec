@@ -214,23 +214,22 @@ class SmartMonster(BayesMonster):
         print('defense')
 
     def update(self):
-        BayesMonster.update(self)
         if (self.state == GUARD_WALK):
-            self.map.monster.schedule_movement(ForcedStep(DOWN), False)
-            self.map.monster.schedule_movement(Wait(10), False)
-            self.map.monster.schedule_movement(ForcedStep(LEFT), False)
-            self.map.monster.schedule_movement(Wait(10), False)
-            self.map.monster.schedule_movement(ForcedStep(UP), False)
-            self.map.monster.schedule_movement(Wait(10), False)
-            self.map.monster.schedule_movement(ForcedStep(RIGHT), False)
-            self.map.monster.schedule_movement(Wait(10), False)
+            self.schedule_movement(ForcedStep(DOWN), False)
+            self.schedule_movement(Wait(10), False)
+            self.schedule_movement(ForcedStep(LEFT), False)
+            self.schedule_movement(Wait(10), False)
+            self.schedule_movement(ForcedStep(UP), False)
+            self.schedule_movement(Wait(10), False)
+            self.schedule_movement(ForcedStep(RIGHT), False)
+            self.schedule_movement(Wait(10), False)
 
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.state = GUARD_OBSERVE
-                self.map.monster.schedule_movement(Wait(2), True)
         else:
             self.goto_corner()
+        BayesMonster.update(self)
 
     def goto_corner(self):
         x, _ = self.corner
@@ -243,13 +242,13 @@ class SmartMonster(BayesMonster):
         x, y = self.corner
 
         if (self.detect_proximity() == RIGHT):
-            self.map.monster.schedule_movement(ForcedStep(UP), True)
-        elif (self.map.monster.position.x != x):
-            self.map.monster.schedule_movement(ForcedStep(RIGHT), True)
-        elif (self.map.monster.position.y != y):
-            self.map.monster.schedule_movement(ForcedStep(UP), True)
+            self.schedule_movement(ForcedStep(UP), True)
+        elif (self.position.x != x):
+            self.schedule_movement(ForcedStep(RIGHT), True)
+        elif (self.position.y != y):
+            self.schedule_movement(ForcedStep(UP), True)
         else:
-            self.map.monster.schedule_movement(Face(DOWN), True)
+            self.schedule_movement(Face(DOWN), True)
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.corner = (1, 8)
@@ -259,29 +258,29 @@ class SmartMonster(BayesMonster):
 
         # If the party is in the way, change row
         if (self.detect_proximity() == LEFT):
-            self.map.monster.schedule_movement(ForcedStep(DOWN), True)
-        elif (self.map.monster.position.x != x):
-            self.map.monster.schedule_movement(ForcedStep(LEFT), True)
-        elif (self.map.monster.position.y != y):
-            self.map.monster.schedule_movement(ForcedStep(DOWN), True)
+            self.schedule_movement(ForcedStep(DOWN), True)
+        elif (self.position.x != x):
+            self.schedule_movement(ForcedStep(LEFT), True)
+        elif (self.position.y != y):
+            self.schedule_movement(ForcedStep(DOWN), True)
         else:
-            self.map.monster.schedule_movement(Face(UP), True)
+            self.schedule_movement(Face(UP), True)
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.corner = (8, 1)
 
     def detect_proximity(self):
-        if (self.map.monster.position.x == self.map.objects[PARTY].position.x and
-                    self.map.monster.position.y == self.map.objects[PARTY].position.y + 1):
+        if (self.position.x == self.map.objects[PARTY].position.x and
+                    self.position.y == self.map.objects[PARTY].position.y + 1):
             return UP
-        elif (self.map.monster.position.x == self.map.objects[PARTY].position.x and
-                      self.map.monster.position.y == self.map.objects[PARTY].position.y - 1):
+        elif (self.position.x == self.map.objects[PARTY].position.x and
+                      self.position.y == self.map.objects[PARTY].position.y - 1):
             return DOWN
-        elif (self.map.monster.position.y == self.map.objects[PARTY].position.y and
-                      self.map.monster.position.x == self.map.objects[PARTY].position.x + 1):
+        elif (self.position.y == self.map.objects[PARTY].position.y and
+                      self.position.x == self.map.objects[PARTY].position.x + 1):
             return LEFT
-        elif (self.map.monster.position.y == self.map.objects[PARTY].position.y and
-                      self.map.monster.position.x == self.map.objects[PARTY].position.x - 1):
+        elif (self.position.y == self.map.objects[PARTY].position.y and
+                      self.position.x == self.map.objects[PARTY].position.x - 1):
             return RIGHT
         else:
             return 0
