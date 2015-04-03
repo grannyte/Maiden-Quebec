@@ -6,11 +6,12 @@ from __future__ import print_function
 HP_INITIAL = 100
 PARTY = 0
 
-
+SECONDS_TO_WAIT = 5
 GUARD_WALK = 1
 GUARD_OBSERVE = 2
+GUARD_ATTACK = 3
 
-
+import time
 from librpg.mapobject import MapObject
 from librpg.movement import *
 from librpg.locals import *
@@ -196,24 +197,14 @@ class CrazyMonster(BayesMonster):
 class SmartMonster(BayesMonster):
     def __init__(self, map, hero):
         BayesMonster.__init__(self, map, hero)
-        self.movement_behavior.movements.extend([])
-        self.hp = HP_INITIAL
-        self.map = map
-        self.party_position = self.map.objects[PARTY].position
         self.state = GUARD_WALK
         self.corner = (8, 1)
-
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        print('defense')
+        self.last_time = time.time()
 
     def update(self):
+        if (time.time() - self.last_time > SECONDS_TO_WAIT):
+            self.state = GUARD_ATTACK
+
         if (self.state == GUARD_WALK):
             self.schedule_movement(ForcedStep(DOWN), False)
             self.schedule_movement(Wait(10), False)
@@ -227,9 +218,12 @@ class SmartMonster(BayesMonster):
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.state = GUARD_OBSERVE
-        else:
+        elif (self.state == GUARD_OBSERVE):
             self.goto_corner()
-        BayesMonster.update(self)
+        else:
+            if(self.detect_proximity() == 0):
+                self.move_to_hero()
+            BayesMonster.update(self)
 
     def goto_corner(self):
         x, _ = self.corner
@@ -285,15 +279,13 @@ class SmartMonster(BayesMonster):
         else:
             return 0
 
+    def move_to_hero(self):
+            if (self.position.x > self.map.objects[PARTY].position.x):
+                self.schedule_movement(ForcedStep(LEFT), True)
+            elif (self.position.x < self.map.objects[PARTY].position.x):
+                self.schedule_movement(ForcedStep(RIGHT), True)
 
-
-
-
-#class Boss(Enemy):
-#    def __init__(self, map):
-#        MapObject.__init__(self, MapObject.OBSTACLE,
-#                           image_file='hulk.png')
-
-
-
-__author__ = 'plperron'
+            if (self.position.y > self.map.objects[PARTY].position.y):
+                self.schedule_movement(ForcedStep(UP), True)
+            elif (self.position.y < self.map.objects[PARTY].position.y):
+                self.schedule_movement(ForcedStep(DOWN), True)
