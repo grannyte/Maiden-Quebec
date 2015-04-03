@@ -18,7 +18,7 @@ class Fight(Movement):
 
     def flow(self, obj):
         if euclidian_distance(self.pos1, self.pos2) == 1:
-            print("enemy1 %s and enemy2 %s" % (type(self.enemy1.action).__name__, type(self.enemy2.action).__name__))
+            print("%s:%s and %s:%s" % (type(self.enemy1).__name__,type(self.enemy1.action).__name__,type(self.enemy2).__name__, type(self.enemy2.action).__name__))
             interaction(self.enemy1, self.enemy2)
             interaction(self.enemy2, self.enemy1)
             self.enemy1.action = ""

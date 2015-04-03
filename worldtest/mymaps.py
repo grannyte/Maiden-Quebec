@@ -86,9 +86,11 @@ class MazeBoulder(ScenarioMapObject):
 
 class SpecialBoulder(ScenarioMapObject):
     def __init__(self, map):
+        self.map = map
         ScenarioMapObject.__init__(self, map, 0, 5)
 
     def activate(self, party_avatar, direction):
+        hero.emousser = 1.0
         print("Votre épée vient de s'aiguiser sur la roche!")
 
 

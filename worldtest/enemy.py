@@ -29,6 +29,8 @@ class Enemy(MapObject):
 
 
 class Hero(Enemy):
+
+
     def __init__(self):
         self.hp = 100
         self.action = Wait(10)
@@ -56,11 +58,9 @@ class BayesMonster(Enemy):
         if(self.count <= 0):
             next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
-                print("1")
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
             elif "Defence" == next_action:
-                print("2")
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
