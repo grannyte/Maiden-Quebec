@@ -119,20 +119,6 @@ class Monster(BayesMonster):
                                                  Wait(30), ForcedStep(RIGHT)])
         self.hp = HP_INITIAL
 
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        hero.hp -= 10
-        self.schedule_movement(Wait(5))
-        if hero.hp <= 0:
-            print("die bitch")
-        print(hero.hp)
-
     def update(self):
         pass
 
@@ -142,16 +128,6 @@ class Guard(BayesMonster):
         BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
-
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        print('defense')
 
     def update(self):
         BayesMonster.update(self)
@@ -165,16 +141,6 @@ class CrazyMonster(BayesMonster):
         self.hp = HP_INITIAL
         self.map = map
         self.party_position = self.map.objects[PARTY].position
-
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        print('defense')
 
     def update(self):
         # Code laid mais au moins on peut tester!
@@ -236,7 +202,6 @@ class SmartMonster(BayesMonster):
             self.schedule_movement(Face(UP), False)
         else:
             self.schedule_movement(Face(DOWN), False)
-
 
     def goto_corner(self):
         x, _ = self.corner
