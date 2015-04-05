@@ -6,7 +6,8 @@ from __future__ import print_function
 HP_INITIAL = 100
 PARTY = 0
 
-SECONDS_TO_WAIT = 5
+SECONDS_TO_WAIT = 10
+
 GUARD_WALK = 1
 GUARD_OBSERVE = 2
 GUARD_ATTACK = 3
@@ -67,11 +68,9 @@ class BayesMonster(Enemy):
         if(self.count <= 0):
             next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
-                print("1")
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
             elif "Defence" == next_action:
-                print("2")
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
@@ -220,10 +219,24 @@ class SmartMonster(BayesMonster):
                 self.state = GUARD_OBSERVE
         elif (self.state == GUARD_OBSERVE):
             self.goto_corner()
+        elif (self.state == GUARD_ATTACK and self.detect_proximity() == 0):
+            self.move_to_hero()
         else:
-            if(self.detect_proximity() == 0):
-                self.move_to_hero()
+            self.face_hero()
             BayesMonster.update(self)
+
+    def face_hero(self):
+        proximity = self.detect_proximity()
+
+        if (proximity == LEFT):
+            self.schedule_movement(Face(LEFT), False)
+        elif (proximity == RIGHT):
+            self.schedule_movement(Face(RIGHT), False)
+        elif (proximity == UP):
+            self.schedule_movement(Face(UP), False)
+        else:
+            self.schedule_movement(Face(DOWN), False)
+
 
     def goto_corner(self):
         x, _ = self.corner
