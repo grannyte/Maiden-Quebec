@@ -2,15 +2,8 @@ from __future__ import print_function
 
 "Le module definit les ennemies posssible a rencontrer"
 
-
 HP_INITIAL = 100
 PARTY = 0
-
-SECONDS_TO_WAIT = 10
-
-GUARD_WALK = 1
-GUARD_OBSERVE = 2
-GUARD_ATTACK = 3
 
 import time
 from librpg.mapobject import MapObject
@@ -105,9 +98,6 @@ class BayesMonster(Enemy):
         self.hero.map_object.schedule_movement(self.hero.action, False)
 
 
-
-
-
 class Monster(BayesMonster):
     def __init__(self, map, hero):
         BayesMonster.__init__(self, map, hero)
@@ -160,17 +150,22 @@ class CrazyMonster(BayesMonster):
 
 
 class SmartMonster(BayesMonster):
+    SECONDS_TO_WAIT = 10
+    GUARD_WALK = 1
+    GUARD_OBSERVE = 2
+    GUARD_ATTACK = 3
+
     def __init__(self, map, hero):
         BayesMonster.__init__(self, map, hero)
-        self.state = GUARD_WALK
+        self.state = SmartMonster.GUARD_WALK
         self.corner = (8, 1)
         self.last_time = time.time()
 
     def update(self):
-        if (time.time() - self.last_time > SECONDS_TO_WAIT):
-            self.state = GUARD_ATTACK
+        if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
+            self.state = SmartMonster.GUARD_ATTACK
 
-        if (self.state == GUARD_WALK):
+        if (self.state == SmartMonster.GUARD_WALK):
             self.schedule_movement(ForcedStep(DOWN), False)
             self.schedule_movement(Wait(10), False)
             self.schedule_movement(ForcedStep(LEFT), False)
@@ -182,10 +177,10 @@ class SmartMonster(BayesMonster):
 
             proximity = self.detect_proximity()
             if (proximity != 0):
-                self.state = GUARD_OBSERVE
-        elif (self.state == GUARD_OBSERVE):
+                self.state = SmartMonster.GUARD_OBSERVE
+        elif (self.state == SmartMonster.GUARD_OBSERVE):
             self.goto_corner()
-        elif (self.state == GUARD_ATTACK and self.detect_proximity() == 0):
+        elif (self.state == SmartMonster.GUARD_ATTACK and self.detect_proximity() == 0):
             self.move_to_hero()
         else:
             self.face_hero()
