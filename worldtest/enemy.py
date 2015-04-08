@@ -2,15 +2,10 @@ from __future__ import print_function
 
 "Le module definit les ennemies posssible a rencontrer"
 
-
 HP_INITIAL = 100
 PARTY = 0
 
-
-GUARD_WALK = 1
-GUARD_OBSERVE = 2
-
-
+import time
 from librpg.mapobject import MapObject
 from librpg.movement import *
 from librpg.locals import *
@@ -66,11 +61,9 @@ class BayesMonster(Enemy):
         if(self.count <= 0):
             next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
-                print("1")
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
             elif "Defence" == next_action:
-                print("2")
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
@@ -105,9 +98,6 @@ class BayesMonster(Enemy):
         self.hero.map_object.schedule_movement(self.hero.action, False)
 
 
-
-
-
 class Monster(BayesMonster):
     def __init__(self, map, hero):
         BayesMonster.__init__(self, map, hero)
@@ -119,20 +109,6 @@ class Monster(BayesMonster):
                                                  Wait(30), ForcedStep(RIGHT)])
         self.hp = HP_INITIAL
 
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        hero.hp -= 10
-        self.schedule_movement(Wait(5))
-        if hero.hp <= 0:
-            print("die bitch")
-        print(hero.hp)
-
     def update(self):
         pass
 
@@ -142,16 +118,6 @@ class Guard(BayesMonster):
         BayesMonster.__init__(self, map, hero)
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
-
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        print('defense')
 
     def update(self):
         BayesMonster.update(self)
@@ -186,30 +152,26 @@ class CrazyMonster(BayesMonster):
                 self.schedule_movement(ForcedStep(UP), True)
             elif self.position.y < self.party_position.y:
                 self.schedule_movement(ForcedStep(DOWN), True)
+        BayesMonster.update(self)
 
 
 class SmartMonster(BayesMonster):
+    SECONDS_TO_WAIT = 10
+    GUARD_WALK = 1
+    GUARD_OBSERVE = 2
+    GUARD_ATTACK = 3
+
     def __init__(self, map, hero):
         BayesMonster.__init__(self, map, hero)
-        self.movement_behavior.movements.extend([])
-        self.hp = HP_INITIAL
-        self.map = map
-        self.party_position = self.map.objects[PARTY].position
-        self.state = GUARD_WALK
+        self.state = SmartMonster.GUARD_WALK
         self.corner = (8, 1)
-
-    def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
-
-    def collide_with_party(self, party_avatar, direction):
-        print('defense')
+        self.last_time = time.time()
 
     def update(self):
-        if (self.state == GUARD_WALK):
+        if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
+            self.state = SmartMonster.GUARD_ATTACK
+
+        if (self.state == SmartMonster.GUARD_WALK):
             self.schedule_movement(ForcedStep(DOWN), False)
             self.schedule_movement(Wait(10), False)
             self.schedule_movement(ForcedStep(LEFT), False)
@@ -221,10 +183,26 @@ class SmartMonster(BayesMonster):
 
             proximity = self.detect_proximity()
             if (proximity != 0):
-                self.state = GUARD_OBSERVE
-        else:
+                self.state = SmartMonster.GUARD_OBSERVE
+        elif (self.state == SmartMonster.GUARD_OBSERVE):
             self.goto_corner()
-        BayesMonster.update(self)
+        elif (self.state == SmartMonster.GUARD_ATTACK and self.detect_proximity() == 0):
+            self.move_to_hero()
+        else:
+            self.face_hero()
+            BayesMonster.update(self)
+
+    def face_hero(self):
+        proximity = self.detect_proximity()
+
+        if (proximity == LEFT):
+            self.schedule_movement(Face(LEFT), False)
+        elif (proximity == RIGHT):
+            self.schedule_movement(Face(RIGHT), False)
+        elif (proximity == UP):
+            self.schedule_movement(Face(UP), False)
+        else:
+            self.schedule_movement(Face(DOWN), False)
 
     def goto_corner(self):
         x, _ = self.corner
@@ -280,15 +258,13 @@ class SmartMonster(BayesMonster):
         else:
             return 0
 
+    def move_to_hero(self):
+            if (self.position.x > self.map.objects[PARTY].position.x):
+                self.schedule_movement(ForcedStep(LEFT), True)
+            elif (self.position.x < self.map.objects[PARTY].position.x):
+                self.schedule_movement(ForcedStep(RIGHT), True)
 
-
-
-
-#class Boss(Enemy):
-#    def __init__(self, map):
-#        MapObject.__init__(self, MapObject.OBSTACLE,
-#                           image_file='hulk.png')
-
-
-
-__author__ = 'plperron'
+            if (self.position.y > self.map.objects[PARTY].position.y):
+                self.schedule_movement(ForcedStep(UP), True)
+            elif (self.position.y < self.map.objects[PARTY].position.y):
+                self.schedule_movement(ForcedStep(DOWN), True)

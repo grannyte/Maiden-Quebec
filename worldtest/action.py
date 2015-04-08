@@ -57,12 +57,12 @@ def euclidian_distance(pos1, pos2):
 
 def interaction(enemy1, enemy2):
     if type(enemy1.action).__name__ == "Attack" and type(enemy2.action).__name__ == "Attack":
-        enemy1.emousser *= 0.95
-        enemy2.emousser *= 0.95
+        enemy1.emousser *= 0.99
+        enemy2.emousser *= 0.99
         enemy1.counters["pared"] += 1
         enemy2.counters["pared"] += 1
     elif type(enemy1.action).__name__ == "Attack" and type(enemy2.action).__name__ == "Defence":
-        enemy1.emousser *= 0.95
+        enemy1.emousser *= 0.99
         enemy2.hp -= (Fight.DAMAGE*enemy1.emousser)
         enemy1.counters["blocked"] += 1
     elif type(enemy1.action).__name__ == "Attack":
