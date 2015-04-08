@@ -7,8 +7,6 @@ PARTY = 0
 
 import time
 from librpg.mapobject import MapObject
-from librpg.movement import *
-from librpg.locals import *
 
 from action import *
 from bayes.inference import *
@@ -46,21 +44,23 @@ class Hero(Enemy):
 
 hero = Hero()
 
+
 class BayesMonster(Enemy):
     def __init__(self, map, hero):
         MapObject.__init__(self, MapObject.OBSTACLE,
                            image_file='hulk.png')
         Enemy.__init__(self, map)
         self.hero = hero
-        self.hero.counters = {"cutted": 0, "blocked": 0, "pared": 0} #reset
+        self.hero.counters = {"cutted": 0, "blocked": 0, "pared": 0}  # reset
         self.bayes = Bayes(self, self.hero)
         self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
         self.map = map
         self.count = 5
 
     def update(self):
-        if(self.count <= 0):
-            next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
+        if (self.count <= 0):
+            next_action = random.choice(
+                ["Attack", "Defence"])  # self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
@@ -68,16 +68,16 @@ class BayesMonster(Enemy):
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
-            print("HERO:"+ str(round(self.hero.hp)) +" MONSTER:"+ str(round(self.hp,0)))
+            print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
             print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
 
             if self.hp <= 1:
-                print (u'Le monstre est mort.')
-                self.destroy()
+                print(u'Le monstre est mort.')
+            # self.destroy()
 
             if self.hero.hp <= 1:
                 print("Vous etes mort")
-                self.map.gameover()
+                #   self.map.gameover()
 
             self.count = 5
         self.count -= 1
@@ -148,14 +148,10 @@ class CrazyMonster(BayesMonster):
             elif self.position.x < self.hero.position.x:
                 self.schedule_movement(ForcedStep(RIGHT), True)
             if self.position.y > self.hero.position.y:
-                self.schedule_movement(ForcedStep(UP), False)
+                self.schedule_movement(ForcedStep(UP), True)
             elif self.position.y < self.hero.position.y:
-                self.schedule_movement(ForcedStep(DOWN), False)
-            if (self.position.x-self.party_position.x+self.position.y-self.party_position.y) <= 2:
-                self.action = Attack((self.hero, self.hero.map_object.position), (self, self.position))
-                self.map_object.schedule_movement(self.hero.action, False)
+                self.schedule_movement(ForcedStep(DOWN), True)
         BayesMonster.update(self)
-
 
 
 class SmartMonster(BayesMonster):
@@ -262,12 +258,12 @@ class SmartMonster(BayesMonster):
             return 0
 
     def move_to_hero(self):
-            if (self.position.x > self.map.objects[PARTY].position.x):
-                self.schedule_movement(ForcedStep(LEFT), True)
-            elif (self.position.x < self.map.objects[PARTY].position.x):
-                self.schedule_movement(ForcedStep(RIGHT), True)
+        if (self.position.x > self.map.objects[PARTY].position.x):
+            self.schedule_movement(ForcedStep(LEFT), True)
+        elif (self.position.x < self.map.objects[PARTY].position.x):
+            self.schedule_movement(ForcedStep(RIGHT), True)
 
-            if (self.position.y > self.map.objects[PARTY].position.y):
-                self.schedule_movement(ForcedStep(UP), True)
-            elif (self.position.y < self.map.objects[PARTY].position.y):
-                self.schedule_movement(ForcedStep(DOWN), True)
+        if (self.position.y > self.map.objects[PARTY].position.y):
+            self.schedule_movement(ForcedStep(UP), True)
+        elif (self.position.y < self.map.objects[PARTY].position.y):
+            self.schedule_movement(ForcedStep(DOWN), True)

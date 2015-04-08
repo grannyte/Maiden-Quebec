@@ -183,12 +183,14 @@ class Map2(WorldMap):
         self.add_object(SavePoint(self), Position(5, 2))
         hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
-        self.monster = ArbreMonster(self, hero)
-        self.add_object(self.monster, Position(2, 4))
         self.monster1 = CrazyMonster(self, hero)
-        self.add_object(self.monster1, Position(6, 4))
-        #self.monster.hero = self.monster1
-        #self.monster.bayes.hero = self.monster1
+        self.add_object(self.monster1, Position(2, 4))
+
+
+        self.monster = ArbreMonster(self, self.monster1)
+        self.add_object(self.monster, Position(6, 4))
+        self.monster1.hero = self.monster
+        self.monster1.bayes.hero = self.monster
         print("DEBUG" + str(self.monster.position))
 
 
