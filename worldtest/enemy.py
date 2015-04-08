@@ -23,6 +23,7 @@ class Enemy(MapObject):
         self.action = Face(DOWN)
         self.emousser = 1.0
         self.counters = {"cutted": 0, "blocked": 0, "pared": 0}
+        self.map_object = self
 
     def update_position(self, position):
         self.position = position
@@ -140,19 +141,21 @@ class CrazyMonster(BayesMonster):
 
     def update(self):
         # Code laid mais au moins on peut tester!
-        BayesMonster.update(self)
-        if self.map.objects[PARTY].position.x != self.party_position.x or self.map.objects[PARTY].position.y != self.party_position.y:
-            self.party_position = self.map.objects[PARTY].position
-            if self.position.x > self.party_position.x:
+        if self.position.x != self.hero.position.x or self.position.y != self.hero.position.y:
+            self.party_position = self.hero.position
+            if self.position.x > self.hero.position.x:
                 self.schedule_movement(ForcedStep(LEFT), True)
-            elif self.position.x < self.party_position.x:
+            elif self.position.x < self.hero.position.x:
                 self.schedule_movement(ForcedStep(RIGHT), True)
-
-            if self.position.y > self.party_position.y:
-                self.schedule_movement(ForcedStep(UP), True)
-            elif self.position.y < self.party_position.y:
-                self.schedule_movement(ForcedStep(DOWN), True)
+            if self.position.y > self.hero.position.y:
+                self.schedule_movement(ForcedStep(UP), False)
+            elif self.position.y < self.hero.position.y:
+                self.schedule_movement(ForcedStep(DOWN), False)
+            if (self.position.x-self.party_position.x+self.position.y-self.party_position.y) <= 2:
+                self.action = Attack((self.hero, self.hero.map_object.position), (self, self.position))
+                self.map_object.schedule_movement(self.hero.action, False)
         BayesMonster.update(self)
+
 
 
 class SmartMonster(BayesMonster):
