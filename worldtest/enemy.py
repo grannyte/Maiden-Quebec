@@ -162,8 +162,10 @@ class SmartMonster(BayesMonster):
         self.last_time = time.time()
 
     def update(self):
-        if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
+        if(time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT and self.state == SmartMonster.GUARD_OBSERVE):
             self.state = SmartMonster.GUARD_ATTACK
+        elif(self.state == SmartMonster.GUARD_WALK):
+            self.last_time = time.time()
 
         if (self.state == SmartMonster.GUARD_WALK):
             self.schedule_movement(ForcedStep(DOWN), False)
@@ -174,7 +176,6 @@ class SmartMonster(BayesMonster):
             self.schedule_movement(Wait(10), False)
             self.schedule_movement(ForcedStep(RIGHT), False)
             self.schedule_movement(Wait(10), False)
-
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.state = SmartMonster.GUARD_OBSERVE
