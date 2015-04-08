@@ -134,7 +134,6 @@ class CrazyMonster(BayesMonster):
 
     def update(self):
         # Code laid mais au moins on peut tester!
-        BayesMonster.update(self)
         if (self.map.objects[PARTY].position.x != self.party_position.x or
                     self.map.objects[PARTY].position.y != self.party_position.y):
             self.party_position = self.map.objects[PARTY].position
@@ -147,6 +146,7 @@ class CrazyMonster(BayesMonster):
                 self.schedule_movement(ForcedStep(UP), True)
             elif (self.position.y < self.party_position.y):
                 self.schedule_movement(ForcedStep(DOWN), True)
+        BayesMonster.update(self)
 
 
 class SmartMonster(BayesMonster):
