@@ -151,6 +151,7 @@ class CrazyMonster(BayesMonster):
 
 class SmartMonster(BayesMonster):
     SECONDS_TO_WAIT = 10
+    SECONDS_TO_ATTACK = 15
     GUARD_WALK = 1
     GUARD_OBSERVE = 2
     GUARD_ATTACK = 3
@@ -164,6 +165,9 @@ class SmartMonster(BayesMonster):
     def update(self):
         if(time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT and self.state == SmartMonster.GUARD_OBSERVE):
             self.state = SmartMonster.GUARD_ATTACK
+        elif(time.time() - self.last_time > SmartMonster.SECONDS_TO_ATTACK and self.state == SmartMonster.GUARD_ATTACK):
+            self.state = SmartMonster.GUARD_OBSERVE
+            self.last_time = time.time()
         elif(self.state == SmartMonster.GUARD_WALK):
             self.last_time = time.time()
 
