@@ -167,29 +167,24 @@ class CrazyMonster(BayesMonster):
         self.party_position = self.map.objects[PARTY].position
 
     def activate(self, party_avatar, direction):
-        self.hp -= 10
-        print(u'Attaque du monstre (-10) [' + str(self.hp) + '/' + str(HP_INITIAL) + ']')
-        if (self.hp <= 0):
-            print(u'Le monstre est mort.')
-            self.destroy()
+        BayesMonster.activate(self, party_avatar, direction)
 
     def collide_with_party(self, party_avatar, direction):
-        print('defense')
+        BayesMonster.collide_with_party(self, party_avatar, direction)
 
     def update(self):
         # Code laid mais au moins on peut tester!
         BayesMonster.update(self)
-        if (self.map.objects[PARTY].position.x != self.party_position.x or
-                    self.map.objects[PARTY].position.y != self.party_position.y):
+        if self.map.objects[PARTY].position.x != self.party_position.x or self.map.objects[PARTY].position.y != self.party_position.y:
             self.party_position = self.map.objects[PARTY].position
-            if (self.position.x > self.party_position.x):
+            if self.position.x > self.party_position.x:
                 self.schedule_movement(ForcedStep(LEFT), True)
-            elif (self.position.x < self.party_position.x):
+            elif self.position.x < self.party_position.x:
                 self.schedule_movement(ForcedStep(RIGHT), True)
 
-            if (self.position.y > self.party_position.y):
+            if self.position.y > self.party_position.y:
                 self.schedule_movement(ForcedStep(UP), True)
-            elif (self.position.y < self.party_position.y):
+            elif self.position.y < self.party_position.y:
                 self.schedule_movement(ForcedStep(DOWN), True)
 
 
