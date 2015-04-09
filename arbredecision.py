@@ -24,21 +24,28 @@ class base_noeud():
 
 
 class noeud_decision(base_noeud):
+    GREATER_THAN = 1
+    GREATER_OR_EQUAL = 2
+    EQUAL = 3
+    LESSER_OR_EQUAL = 4
+    LESSER = 5
+    NOT_EQUAL =6
+
     def __init__(self, type_noeud, valeure_a, valeure_b, droite, gauche):
         base_noeud.__init__(self, type_noeud, valeure_a, valeure_b)
         self.droite = droite
         self.gauche = gauche
 
     def operation(self, tableau):
-        if self.operation == 1:
+        if self.type_noeud == 1:
             return tableau[self.valeure_a] > tableau[self.valeure_b]
-        elif self.operation == 2:
+        elif self.type_noeud == 2:
             return tableau[self.valeure_a] >= tableau[self.valeure_b]
-        elif self.operation == 3:
+        elif self.type_noeud == 3:
             return tableau[self.valeure_a] == tableau[self.valeure_b]
-        elif self.operation == 4:
+        elif self.type_noeud == 4:
             return tableau[self.valeure_a] <= tableau[self.valeure_b]
-        elif self.operation == 5:
+        elif self.type_noeud == 5:
             return tableau[self.valeure_a] < tableau[self.valeure_b]
         else:
             return tableau[self.valeure_a] != tableau[self.valeure_b]
@@ -66,42 +73,47 @@ class noeud_decision(base_noeud):
 class ArbreMonster(BayesMonster):
     def __init__(self, map, enemy):
         BayesMonster.__init__(self, map, enemy)
-        self.racine = noeud_decision(0, 0, 0,
-                                     noeud_decision(0, 0, 0,
+        self.racine = noeud_decision(noeud_decision.LESSER, 0, 2,
+                                     noeud_decision(noeud_decision.NOT_EQUAL, 1, 3,
+                                                    noeud_decision(noeud_decision.LESSER, 1, 3,
+                                                                   noeud_decision(0, 0, 0,
+                                                                                  base_noeud(4, 0, 0),
+                                                                                  base_noeud(4, 0, 0)),
+                                                                   noeud_decision(0, 0, 0,
+                                                                                  base_noeud(3, 0, 0),
+                                                                                  base_noeud(3, 0, 0))),
+                                                    noeud_decision(0, 0, 2,
+                                                                   noeud_decision(0, 0, 0,
+                                                                                  base_noeud(1, 0, 0),
+                                                                                  base_noeud(1, 0, 0)),
+                                                                   noeud_decision(0, 0, 0,
+                                                                                  base_noeud(2, 0, 0),
+                                                                                  base_noeud(2, 0, 0)))),
+                                     noeud_decision(noeud_decision.GREATER_THAN, 1, 3,
                                                     noeud_decision(0, 0, 0,
                                                                    noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)),
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0))),
+                                                                                  base_noeud(3, 0, 0),
+                                                                                  base_noeud(5, 0, 0)),
+                                                                   noeud_decision(5, 1, 3,
+                                                                                  base_noeud(4, 0, 0),
+                                                                                  base_noeud(3, 0, 0))),
                                                     noeud_decision(0, 0, 0,
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)),
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)))),
-                                     noeud_decision(0, 0, 0,
-                                                    noeud_decision(0, 0, 0,
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)),
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0))),
-                                                    noeud_decision(0, 0, 0,
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)),
-                                                                   noeud_decision(0, 0, 0,
-                                                                                  base_noeud(0, 0, 0),
-                                                                                  base_noeud(0, 0, 0)))))
+                                                                   noeud_decision(0, 0, 2,
+                                                                                  base_noeud(3, 0, 0),
+                                                                                  base_noeud(3, 0, 0)),
+                                                                   noeud_decision(0, 0, 2,
+                                                                                  base_noeud(4, 0, 0),
+                                                                                  base_noeud(3, 0, 0)))))
         self.loadfromcsv("Monster1.M")
-        self.actual = 1
-        self.status = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        self.actual = 0
+        self.status = []
         self.enemy = enemy
+        self.lpfile = open("Trace.t", 'w')
+        self.lwtr = csv.writer(self.lpfile, delimiter=',', lineterminator='\n')
+        self.lwtr.writerow(self.status)
         self.tick =0
+        self.generation = 0
+
     def loadfromcsv(self, csvn):
         if os.path.isfile(csvn):
             pfile = open(csvn, 'rb')
@@ -128,7 +140,7 @@ class ArbreMonster(BayesMonster):
             if dist < mindist:
                 mindist = dist
                 minpos = pos
-        valeures = [self.position.x, self.position.y, self.hp, self.enemy.position.x, self.enemy.position.y, self.enemy.hp, minpos.x, minpos.y]
+        valeures = [self.position.x, self.position.y, self.enemy.position.x, self.enemy.position.y, self.hp, self.enemy.hp, minpos.x, minpos.y]
         retour = self.racine.evaluer(valeures)
         if retour == 1:
             self.schedule_movement(ForcedStep(UP), True)
@@ -151,7 +163,7 @@ class ArbreMonster(BayesMonster):
             print("Le monstre est mort")
             self.algogenetique()
 
-        if self.tick >= 250:
+        if self.tick >= 1050:
             print("Le monstre est un trouillard")
             self.algogenetique()
 
@@ -161,13 +173,17 @@ class ArbreMonster(BayesMonster):
         name += str(self.actual)
         name += ".M"
         #self.savetocsv(name)
-        self.status[self.actual] = self.hp-self.enemy.hp*2
+        self.status.append(self.hp-self.enemy.hp*2)
         if self.enemy.hp == 100:
             self.status[self.actual] -= 100
-        if self.actual == 9:
+        if self.actual <= 5:
+            self.generation += 1
+            outgoing = list(self.status)
+            outgoing.append(self.generation)
+            self.lwtr.writerow(outgoing)
             ostatus = list(self.status)
             ostatus.sort()
-            maxval = ostatus[1]
+            maxval = -100
             ostatus = ostatus[-len(self.status)/2:]
             self.actual = 0
             minval = ostatus[:-1]
@@ -233,7 +249,7 @@ class ArbreMonster(BayesMonster):
         self.enemy.hp = 100
         self.enemy.emousser = 1.0
         print(type(self.position))
-        self.map.teleport_object(self, librpg.util.Position(7, 7))
+        self.map.teleport_object(self, librpg.util.Position(random.randrange(2, 7),random.randrange(2,7)))
         self.map.teleport_object(self.enemy, librpg.util.Position(5, 4))
         self.schedule_movement(Wait(10), True)
         self.enemy.schedule_movement(Wait(10), True)

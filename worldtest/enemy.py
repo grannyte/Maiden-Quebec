@@ -144,13 +144,16 @@ class CrazyMonster(BayesMonster):
         if self.position.x != self.hero.position.x or self.position.y != self.hero.position.y:
             self.party_position = self.hero.position
             if self.position.x > self.hero.position.x:
-                self.schedule_movement(ForcedStep(LEFT), True)
+                self.schedule_movement(ForcedStep(LEFT), False)
             elif self.position.x < self.hero.position.x:
-                self.schedule_movement(ForcedStep(RIGHT), True)
+                self.schedule_movement(ForcedStep(RIGHT), False)
             if self.position.y > self.hero.position.y:
-                self.schedule_movement(ForcedStep(UP), True)
+                self.schedule_movement(ForcedStep(UP), False)
             elif self.position.y < self.hero.position.y:
-                self.schedule_movement(ForcedStep(DOWN), True)
+                self.schedule_movement(ForcedStep(DOWN), False)
+
+        self.action = Attack((self, self.position), (self.hero, self.hero.position))
+        self.schedule_movement(self.action, False)
         BayesMonster.update(self)
 
 
@@ -169,7 +172,6 @@ class SmartMonster(BayesMonster):
     def update(self):
         if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
             self.state = SmartMonster.GUARD_ATTACK
-
         if (self.state == SmartMonster.GUARD_WALK):
             self.schedule_movement(ForcedStep(DOWN), False)
             self.schedule_movement(Wait(10), False)
@@ -179,7 +181,6 @@ class SmartMonster(BayesMonster):
             self.schedule_movement(Wait(10), False)
             self.schedule_movement(ForcedStep(RIGHT), False)
             self.schedule_movement(Wait(10), False)
-
             proximity = self.detect_proximity()
             if (proximity != 0):
                 self.state = SmartMonster.GUARD_OBSERVE
@@ -189,7 +190,7 @@ class SmartMonster(BayesMonster):
             self.move_to_hero()
         else:
             self.face_hero()
-            BayesMonster.update(self)
+        BayesMonster.update(self)
 
     def face_hero(self):
         proximity = self.detect_proximity()

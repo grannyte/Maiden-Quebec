@@ -180,7 +180,7 @@ class Map2(WorldMap):
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=10), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=9), RectangleArea((4, 9), (5, 9)))
-        self.add_object(SavePoint(self), Position(5, 2))
+        #self.add_object(SavePoint(self), Position(5, 2))
         #hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
         self.monster1 = SmartMonster(self, hero)
@@ -188,7 +188,7 @@ class Map2(WorldMap):
 
 
         self.monster = ArbreMonster(self, self.monster1)
-        self.add_object(self.monster, Position(7, 7))
+        self.add_object(self.monster, Position(2, 7))
         self.monster1.hero = self.monster
         self.monster1.bayes.hero = self.monster
         print("DEBUG" + str(self.monster.position))
