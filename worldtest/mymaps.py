@@ -170,7 +170,7 @@ class Map1(WorldMap):
 
 class Map2(WorldMap):
     def __init__(self):
-        WorldMap.__init__(self, 'worldtest/map2.map',
+        WorldMap.__init__(self, 'worldtest/map7.map',
                           LOWER_TILESET,
                           UPPER_TILESET)
 
@@ -181,14 +181,14 @@ class Map2(WorldMap):
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
         self.add_area(RelativeTeleportArea(y_offset=-8, map_id=9), RectangleArea((4, 9), (5, 9)))
         self.add_object(SavePoint(self), Position(5, 2))
-        hero.update_position(self.objects[PARTY].position)
+        #hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
-        self.monster1 = CrazyMonster(self, hero)
-        self.add_object(self.monster1, Position(2, 4))
+        self.monster1 = SmartMonster(self, hero)
+        self.add_object(self.monster1, Position(5, 4))
 
 
         self.monster = ArbreMonster(self, self.monster1)
-        self.add_object(self.monster, Position(6, 4))
+        self.add_object(self.monster, Position(7, 7))
         self.monster1.hero = self.monster
         self.monster1.bayes.hero = self.monster
         print("DEBUG" + str(self.monster.position))

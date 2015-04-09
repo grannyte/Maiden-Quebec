@@ -142,7 +142,7 @@ class ArbreMonster(BayesMonster):
             self.schedule_movement(Defence((self, self.position), (self.enemy, self.enemy.position)), True)
         else:
             self.schedule_movement(Attack((self, self.position), (self.enemy, self.enemy.position)), True)
-
+        BayesMonster.update(self)
         if self.hp <= 1:
             print ("l'arbre de decision est mort")
             self.algogenetique()
@@ -161,7 +161,7 @@ class ArbreMonster(BayesMonster):
         name += str(self.actual)
         name += ".M"
         #self.savetocsv(name)
-        self.status[self.actual] = self.hp-self.enemy.hp
+        self.status[self.actual] = self.hp-self.enemy.hp*2
         if self.enemy.hp == 100:
             self.status[self.actual] -= 100
         if self.actual == 9:
@@ -189,10 +189,11 @@ class ArbreMonster(BayesMonster):
                             csvarray.append(linearray)
                         pfile.close()
                         if v != minval:
-                            r = random.randrange(len(csvarray))
-                            b = csvarray[r]
-                            rb = random.randrange(len(b))
-                            csvarray[r][rb] = random.randrange(8)
+                            for i in range(20):
+                                r = random.randrange(len(csvarray))
+                                b = csvarray[r]
+                                rb = random.randrange(len(b))
+                                csvarray[r][rb] = random.randrange(8)
                             self.racine.loadfromarray(csvarray)
                             self.savetocsv(name)
                         elif v == minval:
@@ -232,8 +233,13 @@ class ArbreMonster(BayesMonster):
         self.enemy.hp = 100
         self.enemy.emousser = 1.0
         print(type(self.position))
-        self.map.teleport_object(self, librpg.util.Position(7, 4))
-        self.map.teleport_object(self.enemy, librpg.util.Position(2, 4))
+        self.map.teleport_object(self, librpg.util.Position(7, 7))
+        self.map.teleport_object(self.enemy, librpg.util.Position(5, 4))
+        self.schedule_movement(Wait(10), True)
+        self.enemy.schedule_movement(Wait(10), True)
+        self.enemy.state = SmartMonster.GUARD_WALK
+        self.enemy.corner = (8, 1)
+        self.enemy.last_time = time.time()
         name = "Monster"
         name += str(self.actual)
         name += ".M"

@@ -131,7 +131,7 @@ class CrazyMonster(BayesMonster):
         self.movement_behavior.movements.extend([])
         self.hp = HP_INITIAL
         self.map = map
-        self.party_position = self.map.objects[PARTY].position
+        self.party_position = self.hero.position
 
     def activate(self, party_avatar, direction):
         BayesMonster.activate(self, party_avatar, direction)
@@ -242,28 +242,28 @@ class SmartMonster(BayesMonster):
                 self.corner = (8, 1)
 
     def detect_proximity(self):
-        if (self.position.x == self.map.objects[PARTY].position.x and
-                    self.position.y == self.map.objects[PARTY].position.y + 1):
+        if (self.position.x == self.hero.position.x and
+                    self.position.y == self.hero.position.y + 1):
             return UP
-        elif (self.position.x == self.map.objects[PARTY].position.x and
-                      self.position.y == self.map.objects[PARTY].position.y - 1):
+        elif (self.position.x == self.hero.position.x and
+                      self.position.y == self.hero.position.y - 1):
             return DOWN
-        elif (self.position.y == self.map.objects[PARTY].position.y and
-                      self.position.x == self.map.objects[PARTY].position.x + 1):
+        elif (self.position.y == self.hero.position.y and
+                      self.position.x == self.hero.position.x + 1):
             return LEFT
-        elif (self.position.y == self.map.objects[PARTY].position.y and
-                      self.position.x == self.map.objects[PARTY].position.x - 1):
+        elif (self.position.y == self.hero.position.y and
+                      self.position.x == self.hero.position.x - 1):
             return RIGHT
         else:
             return 0
 
     def move_to_hero(self):
-        if (self.position.x > self.map.objects[PARTY].position.x):
+        if (self.position.x > self.hero.position.x):
             self.schedule_movement(ForcedStep(LEFT), True)
-        elif (self.position.x < self.map.objects[PARTY].position.x):
+        elif (self.position.x < self.hero.position.x):
             self.schedule_movement(ForcedStep(RIGHT), True)
 
-        if (self.position.y > self.map.objects[PARTY].position.y):
+        if (self.position.y > self.hero.position.y):
             self.schedule_movement(ForcedStep(UP), True)
-        elif (self.position.y < self.map.objects[PARTY].position.y):
+        elif (self.position.y < self.hero.position.y):
             self.schedule_movement(ForcedStep(DOWN), True)
