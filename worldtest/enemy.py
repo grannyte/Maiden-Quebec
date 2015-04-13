@@ -13,9 +13,9 @@ from bayes.inference import *
 
 
 class Enemy(MapObject):
-    def __init__(self, map):
+    def __init__(self, map, img='hulk.png'):
         MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
+                           image_file=img)
         self.map = map
         self.hp = 100
         self.action = Face(DOWN)
@@ -46,10 +46,10 @@ hero = Hero()
 
 
 class BayesMonster(Enemy):
-    def __init__(self, map, hero):
+    def __init__(self, map, hero, img='hulk.png'):
         MapObject.__init__(self, MapObject.OBSTACLE,
-                           image_file='hulk.png')
-        Enemy.__init__(self, map)
+                           image_file=img)
+        Enemy.__init__(self, map, img)
         self.hero = hero
         self.hero.counters = {"cutted": 0, "blocked": 0, "pared": 0}  # reset
         self.bayes = Bayes(self, self.hero)
@@ -68,15 +68,15 @@ class BayesMonster(Enemy):
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
-            print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
-            print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
+            #print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
+            #print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
 
-            if self.hp <= 1:
-                print(u'Le monstre est mort.')
+            #if self.hp <= 1:
+            #    print(u'Le monstre est mort.')
             # self.destroy()
 
-            if self.hero.hp <= 1:
-                print("Vous etes mort")
+            #if self.hero.hp <= 1:
+            #    print("Vous etes mort")
                 #   self.map.gameover()
 
             self.count = 5
@@ -91,12 +91,12 @@ class BayesMonster(Enemy):
         return "more" if h > m else "less"
 
     def activate(self, party_avatar, direction):
-        self.hero.action = Attack((self.hero, self.hero.map_object.position), (self, self.position))
-        self.hero.map_object.schedule_movement(self.hero.action, False)
+        self.hero.action = Attack((hero, hero.position), (self, self.position))
+        self.hero.map_object.schedule_movement(hero.action, False)
 
     def collide_with_party(self, party_avatar, direction):
-        self.hero.action = Defence((self.hero, self.hero.map_object.position), (self, self.position))
-        self.hero.map_object.schedule_movement(self.hero.action, False)
+        self.hero.action = Defence((self, self.position), (hero, hero.position))
+        self.hero.map_object.schedule_movement(self.action, False)
 
 
 class Monster(BayesMonster):
@@ -168,41 +168,44 @@ class SmartMonster(BayesMonster):
         self.state = SmartMonster.GUARD_WALK
         self.corner = (8, 1)
         self.last_time = time.time()
-
+        self.tick = 0
+        self.guardloop = MovementCycle([ForcedStep(DOWN),
+                                                Wait(10),
+                                                ForcedStep(LEFT),
+                                                Wait(10),
+                                                ForcedStep(UP),
+                                                Wait(10),
+                                                ForcedStep(RIGHT),
+                                                Wait(10)])
     def update(self):
-        if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
-            self.state = SmartMonster.GUARD_ATTACK
-        if (self.state == SmartMonster.GUARD_WALK):
-            self.schedule_movement(ForcedStep(DOWN), False)
-            self.schedule_movement(Wait(10), False)
-            self.schedule_movement(ForcedStep(LEFT), False)
-            self.schedule_movement(Wait(10), False)
-            self.schedule_movement(ForcedStep(UP), False)
-            self.schedule_movement(Wait(10), False)
-            self.schedule_movement(ForcedStep(RIGHT), False)
-            self.schedule_movement(Wait(10), False)
-            proximity = self.detect_proximity()
-            if (proximity != 0):
-                self.state = SmartMonster.GUARD_OBSERVE
-        elif (self.state == SmartMonster.GUARD_OBSERVE):
-            self.goto_corner()
-        elif (self.state == SmartMonster.GUARD_ATTACK and self.detect_proximity() == 0):
-            self.move_to_hero()
-        else:
-            self.face_hero()
+        self.tick +=1
+        if self.tick >= 6:
+            self.tick =0
+            if (time.time() - self.last_time > SmartMonster.SECONDS_TO_WAIT):
+                self.state = SmartMonster.GUARD_ATTACK
+            if (self.state == SmartMonster.GUARD_WALK):
+                self.schedule_movement(self.guardloop, True)
+                proximity = self.detect_proximity()
+                if (proximity != 0):
+                    self.state = SmartMonster.GUARD_OBSERVE
+            elif (self.state == SmartMonster.GUARD_OBSERVE):
+                self.goto_corner()
+            elif (self.state == SmartMonster.GUARD_ATTACK and self.detect_proximity() == 0):
+                self.move_to_hero()
+            else:
+                self.face_hero()
         BayesMonster.update(self)
 
     def face_hero(self):
         proximity = self.detect_proximity()
-
         if (proximity == LEFT):
-            self.schedule_movement(Face(LEFT), False)
+            self.schedule_movement(Face(LEFT), True)
         elif (proximity == RIGHT):
-            self.schedule_movement(Face(RIGHT), False)
+            self.schedule_movement(Face(RIGHT), True)
         elif (proximity == UP):
-            self.schedule_movement(Face(UP), False)
+            self.schedule_movement(Face(UP), True)
         else:
-            self.schedule_movement(Face(DOWN), False)
+            self.schedule_movement(Face(DOWN), True)
 
     def goto_corner(self):
         x, _ = self.corner
@@ -213,7 +216,6 @@ class SmartMonster(BayesMonster):
 
     def goto_up_right_corner(self):
         x, y = self.corner
-
         if (self.detect_proximity() == RIGHT):
             self.schedule_movement(ForcedStep(UP), True)
         elif (self.position.x != x):
@@ -228,7 +230,6 @@ class SmartMonster(BayesMonster):
 
     def goto_down_left_corner(self):
         x, y = self.corner
-
         # If the party is in the way, change row
         if (self.detect_proximity() == LEFT):
             self.schedule_movement(ForcedStep(DOWN), True)
@@ -263,7 +264,6 @@ class SmartMonster(BayesMonster):
             self.schedule_movement(ForcedStep(LEFT), True)
         elif (self.position.x < self.hero.position.x):
             self.schedule_movement(ForcedStep(RIGHT), True)
-
         if (self.position.y > self.hero.position.y):
             self.schedule_movement(ForcedStep(UP), True)
         elif (self.position.y < self.hero.position.y):

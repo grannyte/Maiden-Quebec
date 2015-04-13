@@ -29,6 +29,7 @@ class Fight(Movement):
 class Attack(Fight):
     def __init__(self, enemy1, enemy2):
         Fight.__init__(self, enemy1, enemy2)
+        print("Attack ")
 
     def flow(self, obj):
         return Fight.flow(self, obj)
@@ -37,6 +38,7 @@ class Attack(Fight):
 class Defence(Fight):
     def __init__(self, enemy1, enemy2):
         Fight.__init__(self, enemy1, enemy2)
+        print("Defence")
 
     def flow(self, obj):
         return Fight.flow(self, obj)
@@ -69,5 +71,7 @@ def interaction(enemy1, enemy2):
         enemy1.emousser *= 0.99
         enemy2.hp -= (Fight.DAMAGE*enemy1.emousser)
         enemy2.counters["cutted"] += 1
+    print(enemy1.hp)
+    print(enemy2.hp)
 
 __author__ = 'plperron'
