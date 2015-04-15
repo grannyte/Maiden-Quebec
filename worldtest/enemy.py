@@ -56,6 +56,7 @@ class BayesMonster(Enemy):
         self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
         self.map = map
         self.count = 5
+        self.simulation = False
 
     def update(self):
         if (self.count <= 0):
@@ -68,16 +69,16 @@ class BayesMonster(Enemy):
                 self.action = Defence((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
 
-            #print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
-            #print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
+            print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
+            print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
 
-            #if self.hp <= 1:
-            #    print(u'Le monstre est mort.')
-            # self.destroy()
+            if self.hp <= 1 and self.simulation == False:
+                print(u'Le monstre est mort.')
+                self.destroy()
 
-            #if self.hero.hp <= 1:
-            #    print("Vous etes mort")
-                #   self.map.gameover()
+            if self.hero.hp <= 1 and self.simulation == False:
+                print("Vous etes mort")
+                self.map.gameover()
 
             self.count = 5
         self.count -= 1
@@ -92,11 +93,11 @@ class BayesMonster(Enemy):
 
     def activate(self, party_avatar, direction):
         self.hero.action = Attack((hero, hero.position), (self, self.position))
-        self.hero.map_object.schedule_movement(hero.action, False)
+        self.hero.map_object.schedule_movement(self.hero.action, False)
 
     def collide_with_party(self, party_avatar, direction):
         self.hero.action = Defence((self, self.position), (hero, hero.position))
-        self.hero.map_object.schedule_movement(self.action, False)
+        self.hero.map_object.schedule_movement(self.hero.action, False)
 
 
 class Monster(BayesMonster):
@@ -159,6 +160,7 @@ class CrazyMonster(BayesMonster):
 
 class SmartMonster(BayesMonster):
     SECONDS_TO_WAIT = 10
+    SECONDS_TO_ATTACK = 15
     GUARD_WALK = 1
     GUARD_OBSERVE = 2
     GUARD_ATTACK = 3

@@ -85,7 +85,7 @@ class ArbreMonster(BayesMonster):
     def __init__(self, map, enemy):
         BayesMonster.__init__(self, map, enemy, 'Rhulk.png')
         self.initarbre()
-        self.loadfromcsv("Monster1.M")
+        self.loadfromcsv("Monster0.M")
         self.actual = 0
         self.status = []
         self.enemy = enemy
@@ -197,17 +197,18 @@ class ArbreMonster(BayesMonster):
         else:
             self.schedule_movement(Attack((self, self.position), (self.enemy, self.enemy.position)), True)
         BayesMonster.update(self)
-        if self.hp <= 1:
-            print ("l'arbre de decision est mort")
-            self.algogenetique()
+        if self.simulation:
+            if self.hp <= 1:
+                print ("l'arbre de decision est mort")
+                self.algogenetique()
 
-        if self.hero.hp <= 1:
-            print("Le monstre est mort")
-            self.algogenetique()
+            if self.hero.hp <= 1:
+                print("Le monstre est mort")
+                self.algogenetique()
 
-        if self.tick >= 1050:
-            print("Le monstre est un trouillard")
-            self.algogenetique()
+            if self.tick >= 1050:
+                print("Le monstre est un trouillard")
+                self.algogenetique()
 
     def algogenetique(self):
         self.tick = 0

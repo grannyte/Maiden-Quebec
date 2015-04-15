@@ -170,7 +170,7 @@ class Map1(WorldMap):
 
 class Map2(WorldMap):
     def __init__(self):
-        WorldMap.__init__(self, 'worldtest/map7.map',
+        WorldMap.__init__(self, 'worldtest/map2.map',
                           LOWER_TILESET,
                           UPPER_TILESET)
 
@@ -179,18 +179,12 @@ class Map2(WorldMap):
         self.add_area(RelativeTeleportArea(x_offset=+8, map_id=1), RectangleArea((0, 2), (0, 7)))
         self.add_area(RelativeTeleportArea(x_offset=-8, map_id=10), RectangleArea((9, 2), (9, 7)))
         self.add_area(RelativeTeleportArea(y_offset=+8, map_id=4), RectangleArea((4, 0), (5, 0)))
-        self.add_area(RelativeTeleportArea(y_offset=-8, map_id=9), RectangleArea((4, 9), (5, 9)))
-        #self.add_object(SavePoint(self), Position(5, 2))
-        #hero.update_position(self.objects[PARTY].position)
+        self.add_area(RelativeTeleportArea(y_offset=-8, map_id=11), RectangleArea((4, 9), (5, 9)))
+        self.add_object(SavePoint(self), Position(5, 2))
+        hero.update_position(self.objects[PARTY].position)
         hero.ref(self.objects[PARTY])
-        self.monster1 = SmartMonster(self, hero)
-        self.add_object(self.monster1, Position(5, 4))
-
-
-        self.monster = ArbreMonster(self, self.monster1)
-        self.add_object(self.monster, Position(2, 7))
-        self.monster1.hero = self.monster
-        self.monster1.bayes.hero = self.monster
+        self.monster = BayesMonster(self, hero)
+        self.add_object(self.monster, Position(5, 4))
         print("DEBUG" + str(self.monster.position))
 
 
@@ -319,3 +313,43 @@ class Map8(WorldMap):
                     self.add_object(SpecialBoulder(self), Position(x, y))
                 elif cell == 2:
                     self.add_object(MazeBoulder(self), Position(x, y))
+
+
+
+class Map11(WorldMap):
+    def __init__(self):
+        WorldMap.__init__(self, 'worldtest/map9.map',
+                          LOWER_TILESET,
+                          UPPER_TILESET)
+
+    def initialize(self, local_state, global_state):
+        print(hero.hp)
+        self.add_area(RelativeTeleportArea(y_offset=+8, map_id=2), RectangleArea((2, 0), (7, 0)))
+        self.add_area(RelativeTeleportArea(x_offset=-8, map_id=12), RectangleArea((9, 2), (9, 7)))
+        hero.update_position(self.objects[PARTY].position)
+        hero.ref(self.objects[PARTY])
+        self.monster1 = SmartMonster(self, hero)
+        self.add_object(self.monster1, Position(5, 4))
+        self.monster1.simulation = True
+
+        self.monster = ArbreMonster(self, self.monster1)
+        self.add_object(self.monster, Position(2, 7))
+        self.monster1.simulation = True
+        self.monster1.hero = self.monster
+        self.monster1.bayes.hero = self.monster
+        print("DEBUG" + str(self.monster.position))
+
+class Map12(WorldMap):
+    def __init__(self):
+        WorldMap.__init__(self, 'worldtest/map7.map',
+                          LOWER_TILESET,
+                          UPPER_TILESET)
+
+    def initialize(self, local_state, global_state):
+        print(hero.hp)
+        self.add_area(RelativeTeleportArea(x_offset=+8, map_id=11), RectangleArea((0, 2), (0, 7)))
+        hero.update_position(self.objects[PARTY].position)
+        hero.ref(self.objects[PARTY])
+        self.monster = ArbreMonster(self, hero)
+        self.add_object(self.monster, Position(5, 4))
+        print("DEBUG" + str(self.monster.position))
