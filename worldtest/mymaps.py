@@ -334,7 +334,7 @@ class Map11(WorldMap):
 
         self.monster = ArbreMonster(self, self.monster1)
         self.add_object(self.monster, Position(2, 7))
-        self.monster1.simulation = True
+        self.monster.simulation = True
         self.monster1.hero = self.monster
         self.monster1.bayes.hero = self.monster
         print("DEBUG" + str(self.monster.position))

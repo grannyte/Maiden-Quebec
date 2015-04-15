@@ -72,11 +72,11 @@ class BayesMonster(Enemy):
             print("HERO:" + str(round(self.hero.hp)) + " MONSTER:" + str(round(self.hp, 0)))
             print("HERO EMOUSSER: " + str(self.hero.emousser) + " MONSTER EMOUSSER: " + str(self.emousser))
 
-            if self.hp <= 1 and self.simulation == False:
+            if self.hp <= 1 and self.simulation is False:
                 print(u'Le monstre est mort.')
                 self.destroy()
 
-            if self.hero.hp <= 1 and self.simulation == False:
+            if self.hero.hp <= 1 and self.simulation is False:
                 print("Vous etes mort")
                 self.map.gameover()
 

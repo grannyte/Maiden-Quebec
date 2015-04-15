@@ -32,7 +32,7 @@ class noeud_decision(base_noeud):
     EQUAL = 3
     LESSER_OR_EQUAL = 4
     LESSER = 5
-    NOT_EQUAL = 6
+    NOT_EQUAL = 10
 
     def __init__(self, type_noeud, valeure_a, valeure_b, droite, gauche):
         base_noeud.__init__(self, type_noeud, valeure_a, valeure_b)
@@ -173,7 +173,7 @@ class ArbreMonster(BayesMonster):
                 minpos = pos
         valeures = [self.position.x, self.position.y, self.enemy.position.x, self.enemy.position.y, self.hp,
                     self.enemy.hp,
-                    minpos.x, minpos.y]
+                    minpos.x, minpos.y, self.bonus, 0]
         retour = self.racine.evaluer(valeures)
         if self.lastpos != self.position:
             self.bonus += 0.1
