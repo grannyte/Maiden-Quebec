@@ -1,13 +1,12 @@
 from __future__ import print_function
 
-"Le module definit les ennemies posssible a rencontrer"
+"Le module definit les ennemies posssibles a rencontrer"
 
 HP_INITIAL = 100
 PARTY = 0
 
 import time
 from librpg.mapobject import MapObject
-from librpg.movement import *
 from librpg.locals import *
 
 from action import *
@@ -44,6 +43,7 @@ class Hero(Enemy):
 
 
 hero = Hero()
+
 
 class BayesMonster(Enemy):
     def __init__(self, map, hero):
