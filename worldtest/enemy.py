@@ -56,7 +56,7 @@ class BayesMonster(Enemy):
         self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
         self.map = map
         self.count = 5
-        
+
 
     def update(self):
         if(self.count <= 0):
