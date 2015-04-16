@@ -4,9 +4,10 @@ Imitate Bayesian network with hardcoded rule
 
 import random
 
+
 class Bayes:
-    def __init__(self, monstre, hero):
-        self.monstre = monstre
+    def __init__(self, monster, hero):
+        self.monstre = monster
         self.hero = hero
         self.network = {
             "EnemyHP": {"parent": [], "nodes": [(.5, "more"), (.5, "less")]},
@@ -33,13 +34,13 @@ class Bayes:
 
 
 def weighted_choice(choices):
-   total = sum(w for c, w in choices)
-   r = random.uniform(0, total)
-   upto = 0
-   for c, w in choices:
-      if upto + w > r:
-         return c
-      upto += w
-   assert False, "Shouldn't get here"
+    total = sum(w for c, w in choices)
+    r = random.uniform(0, total)
+    upto = 0
+    for c, w in choices:
+        if upto + w > r:
+            return c
+        upto += w
+    assert False, "Shouldn't get here"
 
 __author__ = 'plperron'
