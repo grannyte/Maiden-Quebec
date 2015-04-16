@@ -10,7 +10,7 @@ from librpg.mapobject import MapObject
 from librpg.locals import *
 
 from action import *
-from bayes.inference import *
+from bayesian.model import *
 
 
 class Enemy(MapObject):
