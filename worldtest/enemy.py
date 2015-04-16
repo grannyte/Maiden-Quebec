@@ -56,10 +56,11 @@ class BayesMonster(Enemy):
         self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
         self.map = map
         self.count = 5
+        
 
     def update(self):
         if(self.count <= 0):
-            next_action = random.choice(["Attack", "Defence"]) #self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
+            next_action = self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
