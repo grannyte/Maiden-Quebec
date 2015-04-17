@@ -11,7 +11,7 @@ from librpg.path import *
 from librpg.collection.maparea import RelativeTeleportArea
 
 from worldtest.enemy import *
-from arbredecision import*
+from worldtest.arbredecision import*
 
 
 SAVE_FILE = 'save'
