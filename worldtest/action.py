@@ -4,12 +4,11 @@ from __future__ import print_function
 Le module definit les actions necessaires au bon deroulement du jeu.
 """
 
-from librpg.movement import Face, Wait, ForcedStep
-from librpg.locals import *
 from librpg.movement import *
 
 
 class Fight(Movement):
+    # Class de base qui permet l'interaction durant un combat
     DAMAGE = 10
 
     def __init__(self, enemy1, enemy2):
@@ -54,6 +53,7 @@ class Counter(Fight):
 
 
 def euclidian_distance(pos1, pos2):
+    # Calcule la distance euclidienne entre 2 points (en 2D)
     return abs(((pos1.x - pos2.x) * (pos1.x - pos2.x)) + (pos1.y - pos2.y) * (pos1.y - pos2.y))
 
 

@@ -1,15 +1,16 @@
 from __future__ import print_function
 
-"Le module definit les ennemies posssible a rencontrer"
+"Le module definit les ennemies posssibles a rencontrer"
 
 HP_INITIAL = 100
 PARTY = 0
 
 import time
 from librpg.mapobject import MapObject
+from librpg.locals import *
 
 from action import *
-from bayes.inference import *
+from bayesian.model import *
 
 
 class Enemy(MapObject):
@@ -58,10 +59,10 @@ class BayesMonster(Enemy):
         self.count = 5
         self.simulation = False
 
+
     def update(self):
-        if (self.count <= 0):
-            next_action = random.choice(
-                ["Attack", "Defence"])  # self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
+        if(self.count <= 0):
+            next_action = self.bayes.next_action(self.estimate_enemy_hp(), self.estimate_enemy_erode())
             if "Attack" == next_action:
                 self.action = Attack((self, self.position), (self.hero, self.hero.map_object.position))
                 self.schedule_movement(self.action, False)
